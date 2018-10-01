@@ -1,0 +1,10 @@
+{% ckan_extends %}
+
+{% block extras %}
+  {% if pkg_dict.saeri_metadata_1 %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("SAERI Metadata 1") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_metadata_1 }}</td>
+    </tr>
+  {% endif %}
+{% endblock %}
