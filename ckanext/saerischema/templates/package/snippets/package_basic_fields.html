@@ -1,5 +1,9 @@
 {% ckan_extends %}
 
+{# This file adds our custom fields to the editing form #}
+
 {% block package_basic_fields_custom %}
+  {# SAERISCHEMA_BASICFIELDS_START #}
   {{ form.input('saeri_metadata_1', label=_('SAERI Metadata 1'), id='field-seari_metadata_1', placeholder=_('saeri metadata 1 placeholder'), value=data.saeri_metadata_1, error=errors.saeri_metadata_1, classes=['control-medium']) }}
+  {# SAERISCHEMA_BASICFIELDS_END #}
 {% endblock %}

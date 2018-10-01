@@ -1,10 +1,14 @@
 {% ckan_extends %}
 
+{# This file changes the default extras rendering on the dataset page and replaces it to just display our custom fields #}
+
 {% block extras %}
   {% if pkg_dict.saeri_metadata_1 %}
+  {# SAERISCHEMA_ADDINFO_START #}
     <tr>
       <th scope="row" class="dataset-label">{{ _("SAERI Metadata 1") }}</th>
       <td class="dataset-details">{{ pkg_dict.saeri_metadata_1 }}</td>
     </tr>
+  {# SAERISCHEMA_ADDINFO_END #}
   {% endif %}
 {% endblock %}
