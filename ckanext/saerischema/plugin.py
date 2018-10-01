@@ -4,6 +4,7 @@
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+from ckan.plugins.toolkit import Invalid
 
 
 class SaerischemaPlugin(plugins.SingletonPlugin):
@@ -21,6 +22,16 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)
     #plugins.implements(plugins.ITemplateHelpers) # for get_helpers function
 
+    # Helper function to prevent duplicated code
+    # Caller from create_package_schema and update_package_schema.
+    def _modify_package_schema(self, schema):
+        schema.update({
+            # SAERISCHEMA_UPDATE_START
+            'saeri_metadata_1': [toolkit.get_validator('ignore_missing'),
+                                 toolkit.get_converter('convert_to_extras')]
+            # SAERISCHEMA_UPDATE_END
+        })
+        return schema
     # The create_package_schema() function is used whenever a new dataset
     # is created, we'll want update the default schema and insert our
     # custom field here. We will fetch the default schema defined in
@@ -28,13 +39,10 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     # create_package_schema()'s super function and update it.
 
     def create_package_schema(self):
-        # let's grab the default schema in our plugin
+        # get the default schema in our plugin
         schema = super(SaerischemaPlugin, self).create_package_schema()
-        # our custom field
-        schema.update({
-            'saeri_metadata_1': [toolkit.get_validator('ignore_missing'),
-                                 toolkit.get_converter('convert_to_extras')]
-        })
+        # add our custom fields
+        schema = self._modify_package_schema(schema)
         return schema
 
     # The CKAN schema is a dictionary where the key is the name of the field
@@ -46,24 +54,23 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
 
     def update_package_schema(self):
         schema = super(SaerischemaPlugin, self).update_package_schema()
-        # our custom field
-        schema.update({
-            'saeri_metadata_1': [toolkit.get_validator('ignore_missing'),
-                                 toolkit.get_converter('convert_to_extras')]
-        })
+        # add our custom fields
+        schema = self._modify_package_schema(schema)
         return schema
 
     # The show_package_schema() is used when the package_show() action is called
     # We want the default_show_package_schema to be updated to include our
-    # custom field. This time, instead of converting to an extras field,
+    # custom fields. This time, instead of converting to an extras field,
     # we want our field to be converted from an extras field.
     # So we want to use the convert_from_extras() converter.
 
     def show_package_schema(self):
         schema = super(SaerischemaPlugin, self).show_package_schema()
         schema.update({
+            # SAERISCHEMA_SHOW_START
             'saeri_metadata_1': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
+            # SAERISCHEMA_SHOW_END
         })
         return schema
 
