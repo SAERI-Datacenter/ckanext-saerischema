@@ -27,8 +27,8 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def _modify_package_schema(self, schema):
         schema.update({
             # SAERISCHEMA_UPDATE_START
-            'saeri_metadata_1': [toolkit.get_validator('ignore_missing'),
-                                 toolkit.get_converter('convert_to_extras')]
+            #'saeri_metadata_1': [toolkit.get_validator('ignore_missing'),
+            #                     toolkit.get_converter('convert_to_extras')]
             # SAERISCHEMA_UPDATE_END
         })
         return schema
@@ -68,8 +68,8 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         schema = super(SaerischemaPlugin, self).show_package_schema()
         schema.update({
             # SAERISCHEMA_SHOW_START
-            'saeri_metadata_1': [toolkit.get_converter('convert_from_extras'),
-                            toolkit.get_validator('ignore_missing')]
+            #'saeri_metadata_1': [toolkit.get_converter('convert_from_extras'),
+            #                toolkit.get_validator('ignore_missing')]
             # SAERISCHEMA_SHOW_END
         })
         return schema
