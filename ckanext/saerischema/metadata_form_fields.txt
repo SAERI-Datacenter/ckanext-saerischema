@@ -1,0 +1,28 @@
+Region
+Organisation
+Title
+Language
+Abstract
+Topic Category
+Keyword
+Temporal Extent
+Dataset Reference Date
+Lineage
+West Longitude
+South Latitude
+East Longitude
+North Latitude
+Spatial Reference System
+Responsible Organisation Name
+Contact Mail Address
+Responsible Party Role
+Access Limitations
+Use Constraints
+Data Format
+Update Frequency
+Accuracy
+Resource Type
+Original Title
+Metadata Date
+Metadata Point of Contact
+Status

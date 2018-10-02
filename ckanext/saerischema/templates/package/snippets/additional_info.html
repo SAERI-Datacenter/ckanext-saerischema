@@ -3,14 +3,174 @@
 {# This file changes the default extras rendering on the dataset page and replaces it to just display our custom fields #}
 
 {% block extras %}
-  {% if pkg_dict.saeri_metadata_1 %}
   {# SAERISCHEMA_ADDINFO_START #}
-    {#
+  {% if pkg_dict.saeri_region %}
     <tr>
-      <th scope="row" class="dataset-label">{{ _("SAERI Metadata 1") }}</th>
-      <td class="dataset-details">{{ pkg_dict.saeri_metadata_1 }}</td>
+      <th scope="row" class="dataset-label">{{ _("Region") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_region }}</td>
     </tr>
-    #}
-  {# SAERISCHEMA_ADDINFO_END #}
   {% endif %}
+  {% if pkg_dict.saeri_organisation %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Organisation") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_organisation }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_title %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Title") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_title }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_language %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Language") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_language }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_abstract %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Abstract") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_abstract }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_topic_category %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Topic Category") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_topic_category }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_keyword %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Keyword") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_keyword }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_temporal_extent %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Temporal Extent") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_temporal_extent }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_dataset_reference_date %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Dataset Reference Date") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_dataset_reference_date }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_lineage %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Lineage") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_lineage }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_west_longitude %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("West Longitude") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_west_longitude }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_south_latitude %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("South Latitude") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_south_latitude }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_east_longitude %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("East Longitude") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_east_longitude }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_north_latitude %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("North Latitude") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_north_latitude }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_spatial_reference_system %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Spatial Reference System") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_spatial_reference_system }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_responsible_organisation_name %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Responsible Organisation Name") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_responsible_organisation_name }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_contact_mail_address %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Contact Mail Address") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_contact_mail_address }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_responsible_party_role %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Responsible Party Role") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_responsible_party_role }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_access_limitations %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Access Limitations") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_access_limitations }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_use_constraints %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Use Constraints") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_use_constraints }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_data_format %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Data Format") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_data_format }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_update_frequency %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Update Frequency") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_update_frequency }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_accuracy %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Accuracy") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_accuracy }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_resource_type %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Resource Type") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_resource_type }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_original_title %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Original Title") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_original_title }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_metadata_date %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Metadata Date") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_metadata_date }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_metadata_point_of_contact %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Metadata Point of Contact") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_metadata_point_of_contact }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_status %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Status") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_status }}</td>
+    </tr>
+  {% endif %}
+  {# SAERISCHEMA_ADDINFO_END #}
 {% endblock %}

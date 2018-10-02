@@ -1,5 +1,7 @@
 # ckanext-saerischema
 
+See https://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html
+
 ## Installation
 
 first activate your virtual environment
