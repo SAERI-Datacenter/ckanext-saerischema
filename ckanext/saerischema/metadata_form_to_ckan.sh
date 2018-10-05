@@ -44,11 +44,12 @@ touch $file_basicfields_update
 
 # ----------------------------------------------------------------------
 # plugin.py
+# The input file must be tab-separated Label Description
 
 echo "Updating plugin.py"
 comma=""
-cat $file_input | while read line; do
-	label="$line"
+cat $file_input | while IFS="	" read label description; do
+	# Convert the label into an identifier, no spaces, lowercase, saeri_ prefix
 	ident=`echo $label | sed -e 's/^/saeri_/' -e 's/ /_/g' | tr '[:upper:]' '[:lower:]'`
 	#echo "$ident = $label"
 
@@ -66,10 +67,11 @@ sed -i.bck '/SAERISCHEMA_SHOW_START/,/SAERISCHEMA_SHOW_END/!b;//!d;/SAERISCHEMA_
 
 # ----------------------------------------------------------------------
 # additional_info.html
+# The input file must be tab-separated Label Description
 
 echo "Updating additional_info.html"
-cat $file_input | while read line; do
-	label="$line"
+cat $file_input | while IFS="	" read label description; do
+	# Convert the label into an identifier, no spaces, lowercase, saeri_ prefix
 	ident=`echo $label | sed -e 's/^/saeri_/' -e 's/ /_/g' | tr '[:upper:]' '[:lower:]'`
 	#echo "$ident = $label"
 
@@ -86,14 +88,16 @@ sed -i.bak '/SAERISCHEMA_ADDINFO_START/,/SAERISCHEMA_ADDINFO_END/!b;//!d;/SAERIS
 
 # ----------------------------------------------------------------------
 # package_basic_fields.html
+# The input file must be tab-separated Label Description
+# where the Description will be used as the placeholder
 
 echo "Updating package_basic_fields.html"
-cat $file_input | while read line; do
-	label="$line"
+cat $file_input | while IFS="	" read label description; do
+	# Convert the label into an identifier, no spaces, lowercase, saeri_ prefix
 	ident=`echo $label | sed -e 's/^/saeri_/' -e 's/ /_/g' | tr '[:upper:]' '[:lower:]'`
 	#echo "$ident = $label"
 
-	echo "  {{ form.input('${ident}', label=_('${label}'), id='field-${ident}', placeholder=_('${ident} placeholder'), value=data.${ident}, error=errors.${ident}, classes=['control-medium']) }}" >> ${file_basicfields_update}
+	echo "  {{ form.input('${ident}', label=_('${label}'), id='field-${ident}', placeholder=_('${description}'), value=data.${ident}, error=errors.${ident}, classes=['control-medium']) }}" >> ${file_basicfields_update}
 
 done
 

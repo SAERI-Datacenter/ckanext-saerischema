@@ -1,28 +1,28 @@
-Region
-Organisation
-Title
-Language
-Abstract
-Topic Category
-Keyword
-Temporal Extent
-Dataset Reference Date
-Lineage
-West Longitude
-South Latitude
-East Longitude
-North Latitude
-Spatial Reference System
-Responsible Organisation Name
-Contact Mail Address
-Responsible Party Role
-Access Limitations
-Use Constraints
-Data Format
-Update Frequency
-Accuracy
-Resource Type
-Original Title
-Metadata Date
-Metadata Point of Contact
-Status
+Region	Where data was collected: FK, SH, AC, TD, SG
+Organisation	Dept. codes, eg. UCL, BGS, SAERI
+Title	Descriptive name, maybe include Year
+Language	Language code: eng, spa, fre, ita, ger
+Abstract	Clear and concise statement
+Topic Category	Please see documents for a description of this field
+Keyword	Keywords separated by commas
+Temporal Extent	Date or range of dates in the form YYYY-MM-DD or YYYY-YYYY
+Dataset Reference Date	Date that identifies the currency of the publication data
+Lineage	How the data was created, source, process, method updating, quality control
+West Longitude	Decimal degrees (dd.ddd) with plus or minus as necessary
+South Latitude	Decimal degrees (dd.ddd) with plus or minus as necessary
+East Longitude	Decimal degrees (dd.ddd) with plus or minus as necessary
+North Latitude	Decimal degrees (dd.ddd) with plus or minus as necessary
+Spatial Reference System	EPSG:nnnn, or WGS84, UTM30S, etc
+Responsible Organisation Name	Multiple organisations may be provided
+Contact Mail Address	Mail address
+Responsible Party Role	Select from list in documentation
+Access Limitations	Select from list in documentation
+Use Constraints	eg. No conditions apply; Not for navigation; Research purposes only
+Data Format	eg. shape, tiff, jpeg, csv, ascii
+Update Frequency	How often the data resource is updated: continual, weekly, fortnightly, monthly, quarterly, annually, biannually, as needed, irregular, one-off, not planned, unknown
+Accuracy	Accuracy of measurements, eg. 1 metre
+Resource Type	Dataset; Data series; Database; nonGeographicalDataset; report
+Original Title	Original file name
+Metadata Date	Date of original metadata in the form YYYY-MM-DD
+Metadata Point of Contact	Organisation responsible
+Status	COMPLETE or INCOMPLETE
