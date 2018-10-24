@@ -4,3 +4,11 @@
   {% block custom_fields %}
   {% endblock %}
 #}
+
+{# Remove the built-in fields which conflict with our own custom fields #}
+
+{% block package_metadata_author %}
+{% endblock %}
+
+{% block package_metadata_fields_maintainer %}
+{% endblock %}
