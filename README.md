@@ -12,3 +12,9 @@ cd ckanext-saerischema
 python setup.py develop
 ```
 then add `saerischema` to the `ckan.plugins` line in your ckan config file and restart the web server with sudo service apache2 restart
+
+## Updating
+
+cd /usr/lib/ckan/default/src/ckanext-saerischema
+git pull
+sudo service apache2 restart
