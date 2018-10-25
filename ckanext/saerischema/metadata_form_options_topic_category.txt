@@ -1,0 +1,19 @@
+biota	Biota
+boundaries	Boundaries
+climatology - meteorology - atmosphere	Climatology - meteorology - atmosphere
+economy	Economy
+elevation	Elevation
+environment	Environment
+farming	Farming
+geoscientific information	Geoscientific information
+health	Health
+imagery base maps earth cover	Imagery base maps earth cover
+inland waters	Inland waters
+intelligence - military	Intelligence - Military
+location	Location
+oceans	Oceans
+planning cadastre	Planning Cadastre
+society	Society
+structure	Structure
+transportation	Transportation
+utilities - communication	Utilities - Communication

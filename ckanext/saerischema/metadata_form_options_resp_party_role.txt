@@ -1,0 +1,10 @@
+resource provider	Resource provider; who supplies the data
+custodian	Custodian; who accepts accountability and responsibility for the data and ensures appropriate care and maintenance of the data
+owner	Owner; who owns the data
+user	User; who uses the data
+distributor	Distributor; who distributes the data
+originator	Originator; who created the data
+point of contact	Point of Contact; who can be contacted for acquiring knowledge about the data
+processor	Processor; who processed the data in a manner such that the data has been modified
+publisher	Publisher; who published the data
+author	Author; who authored the data

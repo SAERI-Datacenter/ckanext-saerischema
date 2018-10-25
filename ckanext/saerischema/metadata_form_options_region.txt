@@ -1,0 +1,7 @@
+FK	Falkland Islands
+SH	Saint Helena
+AC	Ascension Island
+TD	Tristan da Cunha
+SG	South Georgia
+MS	Montserrat
+UK	UK

@@ -1,0 +1,7 @@
+notfornav	Not to be used for navigational purposes
+notcommercial	Not for commercial use
+researchonly	To be used for research only
+open	Open
+openbut	Open, but copyright and/or Intellectual Property Rights apply
+restricted	Restricted
+restrictedbut	Restricted, but open subject to limitations and prior agreement with responsible organisation. Copyright must be cited
