@@ -1,9 +1,7 @@
 Region	Where data was collected: FK, SH, AC, TD, SG
 Organisation	Dept. codes, eg. UCL, BGS, SAERI
 Language	Language code: eng, spa, fre, ita, ger
-Abstract	Clear and concise statement
 Topic Category	Please see documents for a description of this field
-Keyword	Keywords separated by commas
 Temporal Extent	Date or range of dates in the form YYYY-MM-DD or YYYY-YYYY
 Dataset Reference Date	Date that identifies the currency of the publication data
 Lineage	How the data was created, source, process, method updating, quality control

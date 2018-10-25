@@ -10,6 +10,7 @@ Script to read metadata_form_fields.txt and metadata_form_options files and upda
 
 The metadata field names, one per line, tab separated label and description.
 Do not change these once you've started populating CKAN otherwise the content of the database will be inconsistent.
+Note that Title, Keyword and Abstract have been removed because CKAN already has these built in.
 
 # metadata_form_options_*.txt
 

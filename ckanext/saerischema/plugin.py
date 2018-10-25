@@ -43,11 +43,7 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_language': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
-            ,'saeri_abstract': [toolkit.get_validator('ignore_missing'),
-                                 toolkit.get_converter('convert_to_extras')]
             ,'saeri_topic_category': [toolkit.get_validator('ignore_missing'),
-                                 toolkit.get_converter('convert_to_extras')]
-            ,'saeri_keyword': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_temporal_extent': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
@@ -140,11 +136,7 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                             toolkit.get_validator('ignore_missing')]
             ,'saeri_language': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
-            ,'saeri_abstract': [toolkit.get_converter('convert_from_extras'),
-                            toolkit.get_validator('ignore_missing')]
             ,'saeri_topic_category': [toolkit.get_converter('convert_from_extras'),
-                            toolkit.get_validator('ignore_missing')]
-            ,'saeri_keyword': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
             ,'saeri_temporal_extent': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]

@@ -22,22 +22,10 @@
       <td class="dataset-details">{{ pkg_dict.saeri_language }}</td>
     </tr>
   {% endif %}
-  {% if pkg_dict.saeri_abstract %}
-    <tr>
-      <th scope="row" class="dataset-label">{{ _("Abstract") }}</th>
-      <td class="dataset-details">{{ pkg_dict.saeri_abstract }}</td>
-    </tr>
-  {% endif %}
   {% if pkg_dict.saeri_topic_category %}
     <tr>
       <th scope="row" class="dataset-label">{{ _("Topic Category") }}</th>
       <td class="dataset-details">{{ pkg_dict.saeri_topic_category }}</td>
-    </tr>
-  {% endif %}
-  {% if pkg_dict.saeri_keyword %}
-    <tr>
-      <th scope="row" class="dataset-label">{{ _("Keyword") }}</th>
-      <td class="dataset-details">{{ pkg_dict.saeri_keyword }}</td>
     </tr>
   {% endif %}
   {% if pkg_dict.saeri_temporal_extent %}

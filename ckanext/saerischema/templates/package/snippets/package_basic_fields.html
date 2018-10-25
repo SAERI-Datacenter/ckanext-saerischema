@@ -35,7 +35,6 @@
 </div>
   {{ form.input('saeri_organisation', label=_('Organisation'), id='field-saeri_organisation', placeholder=_('Dept. codes, eg. UCL, BGS, SAERI'), value=data.saeri_organisation, error=errors.saeri_organisation, classes=['control-medium']) }}
   {{ form.input('saeri_language', label=_('Language'), id='field-saeri_language', placeholder=_('Language code: eng, spa, fre, ita, ger'), value=data.saeri_language, error=errors.saeri_language, classes=['control-medium']) }}
-  {{ form.input('saeri_abstract', label=_('Abstract'), id='field-saeri_abstract', placeholder=_('Clear and concise statement'), value=data.saeri_abstract, error=errors.saeri_abstract, classes=['control-medium']) }}
 <div class="form-group control-medium">
   <label for="field-saeri_topic_category" class="control-label">Topic Category</label>
   <div class="controls">
@@ -62,7 +61,6 @@
     </select>
   </div>
 </div>
-  {{ form.input('saeri_keyword', label=_('Keyword'), id='field-saeri_keyword', placeholder=_('Keywords separated by commas'), value=data.saeri_keyword, error=errors.saeri_keyword, classes=['control-medium']) }}
   {{ form.input('saeri_temporal_extent', label=_('Temporal Extent'), id='field-saeri_temporal_extent', placeholder=_('Date or range of dates in the form YYYY-MM-DD or YYYY-YYYY'), value=data.saeri_temporal_extent, error=errors.saeri_temporal_extent, classes=['control-medium']) }}
   {{ form.input('saeri_dataset_reference_date', label=_('Dataset Reference Date'), id='field-saeri_dataset_reference_date', placeholder=_('Date that identifies the currency of the publication data'), value=data.saeri_dataset_reference_date, error=errors.saeri_dataset_reference_date, classes=['control-medium']) }}
   {{ form.input('saeri_lineage', label=_('Lineage'), id='field-saeri_lineage', placeholder=_('How the data was created, source, process, method updating, quality control'), value=data.saeri_lineage, error=errors.saeri_lineage, classes=['control-medium']) }}
