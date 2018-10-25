@@ -15,6 +15,8 @@ then add `saerischema` to the `ckan.plugins` line in your ckan config file and r
 
 ## Updating
 
+```
 cd /usr/lib/ckan/default/src/ckanext-saerischema
 git pull
 sudo service apache2 restart
+```
