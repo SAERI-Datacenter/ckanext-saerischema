@@ -1,3 +1,5 @@
+# 1.02 arb Tue 23 Oct 18:08:18 BST 2018 - added metadata, added logging,
+#          removed unused class
 # 1.01 arb Mon  3 Sep 17:31:01 BST 2018 - added SAERI metadata functions
 #          but not implemented the actual schema yet.
 # See: http://docs.ckan.org/en/2.8/extensions/adding-custom-fields.ht
@@ -5,33 +7,39 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckan.plugins.toolkit import Invalid
+import logging
+
+log = logging.getLogger(__name__)
 
 
-class SaerischemaPlugin(plugins.SingletonPlugin):
-    plugins.implements(plugins.IConfigurer)
+#class SaerischemaPlugin(plugins.SingletonPlugin):
+#    plugins.implements(plugins.IConfigurer)
 
     # IConfigurer
 
-    def update_config(self, config_):
-        toolkit.add_template_directory(config_, 'templates')
-        toolkit.add_public_directory(config_, 'public')
-        toolkit.add_resource('fanstatic', 'saerischema')
+#    def update_config(self, config_):
+#        toolkit.add_template_directory(config_, 'templates')
+#        toolkit.add_public_directory(config_, 'public')
+#        toolkit.add_resource('fanstatic', 'saerischema')
+#        log.debug("SaerischemaPlugin old version of update_config called, wasn't expecting this!")
 
 class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.IConfigurer)
     #plugins.implements(plugins.ITemplateHelpers) # for get_helpers function
 
+    log.debug("SaerischemaPlugin created")
+
     # Helper function to prevent duplicated code
     # Caller from create_package_schema and update_package_schema.
     def _modify_package_schema(self, schema):
+        log.debug("SaerischemaPlugin _modify_package_schema called")
+
         schema.update({
             # SAERISCHEMA_UPDATE_START
             'saeri_region': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_organisation': [toolkit.get_validator('ignore_missing'),
-                                 toolkit.get_converter('convert_to_extras')]
-            ,'saeri_title': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_language': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
@@ -93,6 +101,7 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     # create_package_schema()'s super function and update it.
 
     def create_package_schema(self):
+        log.debug("SaerischemaPlugin create_package_schema called")
         # get the default schema in our plugin
         schema = super(SaerischemaPlugin, self).create_package_schema()
         # add our custom fields
@@ -107,6 +116,7 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     # with the same update code.
 
     def update_package_schema(self):
+        log.debug("SaerischemaPlugin update_package_schema called")
         schema = super(SaerischemaPlugin, self).update_package_schema()
         # add our custom fields
         schema = self._modify_package_schema(schema)
@@ -119,14 +129,14 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     # So we want to use the convert_from_extras() converter.
 
     def show_package_schema(self):
+        log.debug("SaerischemaPlugin show_package_schema called")
         schema = super(SaerischemaPlugin, self).show_package_schema()
+        log.debug("SaerischemaPlugin schema before = {}".format(str(schema)))
         schema.update({
             # SAERISCHEMA_SHOW_START
             'saeri_region': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
             ,'saeri_organisation': [toolkit.get_converter('convert_from_extras'),
-                            toolkit.get_validator('ignore_missing')]
-            ,'saeri_title': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
             ,'saeri_language': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
@@ -210,3 +220,6 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         # Add this plugin's templates dir to CKAN's extra_template_paths, so
         # that CKAN will use this plugin's custom templates.
         toolkit.add_template_directory(config, 'templates')
+        toolkit.add_public_directory(config, 'public')
+        toolkit.add_resource('fanstatic', 'saerischema')
+        log.debug("SaerischemaPlugin update_config called")
