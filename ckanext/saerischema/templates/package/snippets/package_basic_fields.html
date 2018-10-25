@@ -1,8 +1,23 @@
 {% ckan_extends %}
 
 {# This file adds our custom fields to the editing form #}
+{# Original is here: /usr/lib/ckan/default/src/ckan/ckan/templates/package/snippets/package_basic_fields.html #}
+
+{# These fields are deliberately empty to override the Description in the original #}
+{# so we can re-implement it below in the correct place on the page #}
+{% block package_basic_fields_description %}
+{% endblock %}
+{% block package_basic_fields_tags %}
+{% endblock %}
 
 {% block package_basic_fields_custom %}
+
+  {# These are COPIED from the original so that they appear above not below #}
+  {{ form.markdown('notes', id='field-notes', label=_('Abstract'), placeholder=_('eg. Some useful notes about the data'), value=data.notes, error=errors.notes) }}
+  {% set tag_attrs = {'data-module': 'autocomplete', 'data-module-tags': '', 'data-module-source': '/api/2/util/tag/autocomplete?incomplete=?'} %}
+  {{ form.input('tag_string', id='field-tags', label=_('Keywords / Tags'), placeholder=_('eg. economy, mental health, government'), value=data.tag_string, error=errors.tags, classes=['control-full'], attrs=tag_attrs) }}
+
+  {# The following is REPLACED by our metadata_form_to_ckan.sh script so DO NOT EDIT #}
   {# SAERISCHEMA_BASICFIELDS_START #}
 <div class="form-group control-medium">
   <label for="field-saeri_region" class="control-label">Region</label>
@@ -19,32 +34,31 @@
   </div>
 </div>
   {{ form.input('saeri_organisation', label=_('Organisation'), id='field-saeri_organisation', placeholder=_('Dept. codes, eg. UCL, BGS, SAERI'), value=data.saeri_organisation, error=errors.saeri_organisation, classes=['control-medium']) }}
-  {{ form.input('saeri_title', label=_('Title'), id='field-saeri_title', placeholder=_('Descriptive name, maybe include Year'), value=data.saeri_title, error=errors.saeri_title, classes=['control-medium']) }}
   {{ form.input('saeri_language', label=_('Language'), id='field-saeri_language', placeholder=_('Language code: eng, spa, fre, ita, ger'), value=data.saeri_language, error=errors.saeri_language, classes=['control-medium']) }}
   {{ form.input('saeri_abstract', label=_('Abstract'), id='field-saeri_abstract', placeholder=_('Clear and concise statement'), value=data.saeri_abstract, error=errors.saeri_abstract, classes=['control-medium']) }}
 <div class="form-group control-medium">
   <label for="field-saeri_topic_category" class="control-label">Topic Category</label>
   <div class="controls">
     <select id="field-saeri_topic_category" name="saeri_topic_category" data-module="autocomplete">
-      <option value="biota">Biota</option>
-      <option value="boundaries">Boundaries</option>
+      <option value="biota">Biota; flora and/or fauna in natural environment</option>
+      <option value="boundaries">Boundaries; legal land descriptions</option>
       <option value="climatology - meteorology - atmosphere">Climatology - meteorology - atmosphere</option>
-      <option value="economy">Economy</option>
-      <option value="elevation">Elevation</option>
-      <option value="environment">Environment</option>
-      <option value="farming">Farming</option>
-      <option value="geoscientific information">Geoscientific information</option>
-      <option value="health">Health</option>
+      <option value="economy">Economy; economic activities, conditions and employment</option>
+      <option value="elevation">Elevation; height above or below sea level</option>
+      <option value="environment">Environment; environmental resources, protection and conservation</option>
+      <option value="farming">Farming; animals or plants</option>
+      <option value="geoscientific information">Geoscientific information; earth sciences</option>
+      <option value="health">Health; health services, human ecology, safety</option>
       <option value="imagery base maps earth cover">Imagery base maps earth cover</option>
-      <option value="inland waters">Inland waters</option>
-      <option value="intelligence - military">Intelligence - Military</option>
-      <option value="location">Location</option>
-      <option value="oceans">Oceans</option>
-      <option value="planning cadastre">Planning Cadastre</option>
-      <option value="society">Society</option>
-      <option value="structure">Structure</option>
-      <option value="transportation">Transportation</option>
-      <option value="utilities - communication">Utilities - Communication</option>
+      <option value="inland waters">Inland waters; drainage systems</option>
+      <option value="intelligence - military">Intelligence - Military; bases, structures, activities</option>
+      <option value="location">Location; positional information and services</option>
+      <option value="oceans">Oceans; salt water bodies (not inland waters)</option>
+      <option value="planning cadastre">Planning Cadastre; future land use</option>
+      <option value="society">Society; and culture</option>
+      <option value="structure">Structure; man-made construction</option>
+      <option value="transportation">Transportation; of persons and goods</option>
+      <option value="utilities - communication">Utilities - Communication; energy, water and waste systems and communications infrastructure and services</option>
     </select>
   </div>
 </div>
@@ -59,23 +73,7 @@
   {{ form.input('saeri_spatial_reference_system', label=_('Spatial Reference System'), id='field-saeri_spatial_reference_system', placeholder=_('EPSG:nnnn, or WGS84, UTM30S, etc'), value=data.saeri_spatial_reference_system, error=errors.saeri_spatial_reference_system, classes=['control-medium']) }}
   {{ form.input('saeri_responsible_organisation_name', label=_('Responsible Organisation Name'), id='field-saeri_responsible_organisation_name', placeholder=_('Multiple organisations may be provided'), value=data.saeri_responsible_organisation_name, error=errors.saeri_responsible_organisation_name, classes=['control-medium']) }}
   {{ form.input('saeri_contact_mail_address', label=_('Contact Mail Address'), id='field-saeri_contact_mail_address', placeholder=_('Mail address'), value=data.saeri_contact_mail_address, error=errors.saeri_contact_mail_address, classes=['control-medium']) }}
-<div class="form-group control-medium">
-  <label for="field-saeri_responsible_party_role" class="control-label">Responsible Party Role</label>
-  <div class="controls">
-    <select id="field-saeri_responsible_party_role" name="saeri_responsible_party_role" data-module="autocomplete">
-      <option value="resource provider">Resource provider; who supplies the data</option>
-      <option value="custodian">Custodian; who accepts accountability and responsibility for the data and ensures appropriate care and maintenance of the data</option>
-      <option value="owner">Owner; who owns the data</option>
-      <option value="user">User; who uses the data</option>
-      <option value="distributor">Distributor; who distributes the data</option>
-      <option value="originator">Originator; who created the data</option>
-      <option value="point of contact">Point of Contact; who can be contacted for acquiring knowledge about the data</option>
-      <option value="processor">Processor; who processed the data in a manner such that the data has been modified</option>
-      <option value="publisher">Publisher; who published the data</option>
-      <option value="author">Author; who authored the data</option>
-    </select>
-  </div>
-</div>
+  {{ form.input('saeri_responsible_party_role', label=_('Responsible Party Role'), id='field-saeri_responsible_party_role', placeholder=_('Select from list in documentation'), value=data.saeri_responsible_party_role, error=errors.saeri_responsible_party_role, classes=['control-medium']) }}
 <div class="form-group control-medium">
   <label for="field-saeri_access_limitations" class="control-label">Access Limitations</label>
   <div class="controls">
@@ -98,8 +96,8 @@
   <label for="field-saeri_use_constraints" class="control-label">Use Constraints</label>
   <div class="controls">
     <select id="field-saeri_use_constraints" name="saeri_use_constraints" data-module="autocomplete">
-      <option value="notfornav">Not to be used for navigational purposes</option>
       <option value="notcommercial">Not for commercial use</option>
+      <option value="notfornav">Not to be used for navigational purposes</option>
       <option value="researchonly">To be used for research only</option>
       <option value="open">Open</option>
       <option value="openbut">Open, but copyright and/or Intellectual Property Rights apply</option>
