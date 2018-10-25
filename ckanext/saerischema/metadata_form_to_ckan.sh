@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# Three files to update:
+# This script reads the metadata*txt files and updates the CKAN
+# metadata entry form and the CKAN dataset display page to handle
+# the extra metadata required for SAERI. It only needs to be run
+# once you edit the metadata*txt files. It updates:
 #   plugin.py
 #   templates/package/snippets/additional_info.html
 #   templates/package/snippets/package_basic_fields.html
@@ -8,11 +11,6 @@
 # Input file contains one line for each metadata item
 file_input="metadata_form_fields.txt"
 if [ ! -f $file_input ]; then echo ERROR: no such file $file_input >&2; exit 1; fi
-
-# For testing locally:
-#file_plugin="metadata_form_test_plugin.txt"
-#file_addinfo="metadata_form_test_additional_info.txt"
-#file_basicfields="metadata_form_test_package_basic_fields.txt"
 
 # For use within the extension:
 file_plugin="plugin.py"
@@ -125,8 +123,9 @@ cat $file_input | while IFS="	" read label description; do
 	# but there is no macro for dropdown menus so we use our own function defined above.
 	if [ "$label" == "Region" ]; then
 		read_options_file "metadata_form_options_region.txt" "${file_basicfields_update}" "$ident" "$label"
-	elif [ "$label" == "Responsible Party Role" ]; then
-		read_options_file "metadata_form_options_resp_party_role.txt" "${file_basicfields_update}" "$ident" "$label"
+	# Responsible Party Role might need multiple values so don't constrain it with a drop-down menu
+	#elif [ "$label" == "Responsible Party Role" ]; then
+	#	read_options_file "metadata_form_options_resp_party_role.txt" "${file_basicfields_update}" "$ident" "$label"
 	elif [ "$label" == "Access Limitations" ]; then
 		read_options_file "metadata_form_options_access_limitations.txt" "${file_basicfields_update}" "$ident" "$label"
 	elif [ "$label" == "Status" ]; then
