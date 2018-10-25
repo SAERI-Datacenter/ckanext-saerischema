@@ -1,6 +1,5 @@
 Region	Where data was collected: FK, SH, AC, TD, SG
 Organisation	Dept. codes, eg. UCL, BGS, SAERI
-Title	Descriptive name, maybe include Year
 Language	Language code: eng, spa, fre, ita, ger
 Abstract	Clear and concise statement
 Topic Category	Please see documents for a description of this field
