@@ -1,7 +1,7 @@
 FK	Falkland Islands
 SH	Saint Helena
 AC	Ascension Island
-TD	Tristan da Cunha
-SG	South Georgia
+TA	Tristan da Cunha
+GS	South Georgia
 MS	Montserrat
 UK	UK
