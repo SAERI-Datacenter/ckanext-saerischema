@@ -1,34 +1,96 @@
+# 1.03 arb - create spatial extra
 # 1.02 arb Tue 23 Oct 18:08:18 BST 2018 - added metadata, added logging,
 #          removed unused class
 # 1.01 arb Mon  3 Sep 17:31:01 BST 2018 - added SAERI metadata functions
 #          but not implemented the actual schema yet.
-# See: http://docs.ckan.org/en/2.8/extensions/adding-custom-fields.ht
+# See: http://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html
+
+# Assumptions: the user only enters numbers in degrees on WGS84 for
+# the N,S,E,W and that they describe a bounding box. The CRS field is ignored.
+
+# To do:
+# Extract GeoJSON back to bounding box when displaying ???
+# GeoJSON is:
+# { "type": "Point", "coordinates": [-3.145,53.078] }
+# { "type": "Polygon", "coordinates": [[[2.05827, 49.8625],[2.05827, 55.7447], [-6.41736, 55.7447], [-6.41736, 49.8625], [2.05827, 49.8625]]] }
+# NB. WKT is: POLYGON((lon lat, lon2 lat2, lon3 lat3, lon4 lat4, lon lat))
+# Note that the first and last are the same point.
+#
+# The convert_to/from_extras code is here:
+# /usr/lib/ckan/default/src/ckan/ckan/logic/converters.py
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckan.plugins.toolkit import Invalid
 import logging
 
+# Doesn't work (is ignored): logging.basicConfig(filename="/tmp/ckan_debug.log", level=logging.DEBUG) # XXX arb ???
 log = logging.getLogger(__name__)
 
 
-#class SaerischemaPlugin(plugins.SingletonPlugin):
-#    plugins.implements(plugins.IConfigurer)
+# ---------------------------------------------------------------------
+# Our validator converts the bounding box values into a spatial extra
+# It takes the values from saeri_north/south/east/west and creates a
+# GeoJSON string which is placed into the extra called 'spatial'.
+# 1 param (value) return value, or it can be converted if you wish
+# 2 param (value, context) likewise. nb can raise(Invalid) if you wish.
+# 4 param (key, flattened_data, errors, context) return None as it can
+#  update stuff
+# See https://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html#custom-validators
+def SaerischemaPlugin_validator_convert_bbox_to_spatial(key, flattened_data, errors, context):
+    log.debug("SaerischemaPlugin convert_bbox_to_spatial")
+    log.debug("SaerischemaPlugin flattened_data is %s" % (str(flattened_data)))
 
-    # IConfigurer
+    # Lookup the entered values (warning: might not be validated/converted yet)
+    n = float(flattened_data[('saeri_north_latitude',)])
+    s = float(flattened_data[('saeri_south_latitude',)])
+    w = float(flattened_data[('saeri_west_longitude',)])
+    e = float(flattened_data[('saeri_east_longitude',)])
+    # XXX need to check the SRS field and convert the given coordinates to WGS84
+    # as GeoJSON no longer has a way of specifying the CRS.
 
-#    def update_config(self, config_):
-#        toolkit.add_template_directory(config_, 'templates')
-#        toolkit.add_public_directory(config_, 'public')
-#        toolkit.add_resource('fanstatic', 'saerischema')
-#        log.debug("SaerischemaPlugin old version of update_config called, wasn't expecting this!")
+    # Construct GeoJSON format from bounding box
+    # eg. '{ "type": "Polygon", "coordinates": [[ [ -59.26,-51.94 ], [ -57.62,-51.94 ], [ -57.62,-51.16 ], [ -59.26,-51.16 ], [ -59.26,-51.94 ] ]] }'
+    geojson = '{ "type": "Polygon", "coordinates": [ [ '
+    geojson += '[ %f, %f ], ' % (w,n)
+    geojson += '[ %f, %f ], ' % (e,n)
+    geojson += '[ %f, %f ], ' % (e,s)
+    geojson += '[ %f, %f ], ' % (w,s)
+    geojson += '[ %f, %f ] '  % (w,n)
+    geojson += '] ] }'
+
+    log.debug("SaerischemaPlugin N %f" % (n))
+    log.debug("SaerischemaPlugin S %f" % (s))
+    log.debug("SaerischemaPlugin W %f" % (w))
+    log.debug("SaerischemaPlugin E %f" % (e))
+    log.debug("SaerischemaPlugin GeoJSON %s" % (geojson))
+
+    # check if spatial exists first
+    # what to do if it does?
+    if ('spatial',) in flattened_data:
+        log.debug("SaerischemaPlugin existing spatial (will be overwritten) was %s" % (flattened_data[('spatial',)]))
+
+    # Give the spatial extra the new GeoJSON value.
+    flattened_data[('spatial',)] = geojson
+
+
+# ---------------------------------------------------------------------
+# Our class contains the additional schema elements required for our metadata
 
 class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IValidators) # for get_validators function
     #plugins.implements(plugins.ITemplateHelpers) # for get_helpers function
 
     log.debug("SaerischemaPlugin created")
+
+
+    # Return the list of validators which we supply (functions must be global)
+    def get_validators(self):
+        log.debug("SaerischemaPlugin get_validators")
+        return { 'convert_bbox_to_spatial': SaerischemaPlugin_validator_convert_bbox_to_spatial }
+
 
     # Helper function to prevent duplicated code
     # Caller from create_package_schema and update_package_schema.
@@ -52,6 +114,7 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             ,'saeri_lineage': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_west_longitude': [toolkit.get_validator('ignore_missing'),
+                                 toolkit.get_converter('convert_bbox_to_spatial'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_south_latitude': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
@@ -89,6 +152,11 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                                  toolkit.get_converter('convert_to_extras')]
             # SAERISCHEMA_UPDATE_END
         })
+        # If the schema doesn't already have a 'spatial' extra then add it now
+        if not 'spatial' in schema:
+            log.debug("SaerischemaPlugin _modify_package_schema adding spatial to schema")
+            schema.update({'spatial': [toolkit.get_validator('ignore_missing'),
+                                 toolkit.get_converter('convert_to_extras')]})
         return schema
     # The create_package_schema() function is used whenever a new dataset
     # is created, we'll want update the default schema and insert our
@@ -127,7 +195,7 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def show_package_schema(self):
         log.debug("SaerischemaPlugin show_package_schema called")
         schema = super(SaerischemaPlugin, self).show_package_schema()
-        log.debug("SaerischemaPlugin schema before = {}".format(str(schema)))
+        #log.debug("SaerischemaPlugin schema before = {}".format(str(schema)))
         schema.update({
             # SAERISCHEMA_SHOW_START
             'saeri_region': [toolkit.get_converter('convert_from_extras'),
@@ -182,6 +250,11 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                             toolkit.get_validator('ignore_missing')]
             # SAERISCHEMA_SHOW_END
         })
+        # If the schema doesn't already have a 'spatial' extra then add it now
+        if not 'spatial' in schema:
+            log.debug("SaerischemaPlugin show_package_schema adding spatial to schema")
+            schema.update({'spatial': [toolkit.get_converter('convert_from_extras'),
+                            toolkit.get_validator('ignore_missing')]})
         return schema
 
     # The package_types() function defines a list of dataset types that this
@@ -200,10 +273,9 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         # registers itself as the default (above).
         return []
 
-# In order for our new field to be visible on the CKAN front-end, we need to
-# update the templates.
-# Make the plugin implement the IConfigurer interface:
-
+    # In order for our new field to be visible on the CKAN front-end, we need to
+    # update the templates.
+    # Make the plugin implement the IConfigurer interface.
     # This interface allows to implement a function update_config() that
     # allows us to update the CKAN config, in our case we want to add an
     # additional location for CKAN to look for templates:

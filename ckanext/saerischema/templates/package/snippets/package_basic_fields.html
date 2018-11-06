@@ -13,6 +13,8 @@
 {% block package_basic_fields_custom %}
 
   {# These are COPIED from the original so that they appear above not below #}
+  {# They are also renamed for SAERI to Abstract and Keywords / Tags #}
+
   {{ form.markdown('notes', id='field-notes', label=_('Abstract'), placeholder=_('eg. Some useful notes about the data'), value=data.notes, error=errors.notes) }}
   {% set tag_attrs = {'data-module': 'autocomplete', 'data-module-tags': '', 'data-module-source': '/api/2/util/tag/autocomplete?incomplete=?'} %}
   {{ form.input('tag_string', id='field-tags', label=_('Keywords / Tags'), placeholder=_('eg. economy, mental health, government'), value=data.tag_string, error=errors.tags, classes=['control-full'], attrs=tag_attrs) }}
@@ -121,4 +123,9 @@
   </div>
 </div>
   {# SAERISCHEMA_BASICFIELDS_END #}
+
+  {# This additional field shows the spatial GeoJSON field #}
+  {# We always want this shown (normal CKAN treats it as an 'extra') #}
+  {{ form.input('spatial', label=_('Geographic Location'), id='field-spatial', placeholder=_('GeoJSON format ONLY (not for human use)'), value=data.spatial, error=errors.spatial, classes=['control-medium']) }}
+
 {% endblock %}
