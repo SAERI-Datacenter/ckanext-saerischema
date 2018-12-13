@@ -101,20 +101,19 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             # SAERISCHEMA_UPDATE_START
             'saeri_region': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
-            ,'saeri_organisation': [toolkit.get_validator('ignore_missing'),
-                                 toolkit.get_converter('convert_to_extras')]
             ,'saeri_language': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_topic_category': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
-            ,'saeri_temporal_extent': [toolkit.get_validator('ignore_missing'),
+            ,'saeri_temporal_extent_start': [toolkit.get_validator('ignore_missing'),
+                                 toolkit.get_converter('convert_to_extras')]
+            ,'saeri_temporal_extent_end': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_dataset_reference_date': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_lineage': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_west_longitude': [toolkit.get_validator('ignore_missing'),
-                                 toolkit.get_converter('convert_bbox_to_spatial'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_south_latitude': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
@@ -200,13 +199,13 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             # SAERISCHEMA_SHOW_START
             'saeri_region': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
-            ,'saeri_organisation': [toolkit.get_converter('convert_from_extras'),
-                            toolkit.get_validator('ignore_missing')]
             ,'saeri_language': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
             ,'saeri_topic_category': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
-            ,'saeri_temporal_extent': [toolkit.get_converter('convert_from_extras'),
+            ,'saeri_temporal_extent_start': [toolkit.get_converter('convert_from_extras'),
+                            toolkit.get_validator('ignore_missing')]
+            ,'saeri_temporal_extent_end': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
             ,'saeri_dataset_reference_date': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]

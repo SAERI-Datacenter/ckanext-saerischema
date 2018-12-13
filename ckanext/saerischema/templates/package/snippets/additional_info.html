@@ -10,12 +10,6 @@
       <td class="dataset-details">{{ pkg_dict.saeri_region }}</td>
     </tr>
   {% endif %}
-  {% if pkg_dict.saeri_organisation %}
-    <tr>
-      <th scope="row" class="dataset-label">{{ _("Organisation") }}</th>
-      <td class="dataset-details">{{ pkg_dict.saeri_organisation }}</td>
-    </tr>
-  {% endif %}
   {% if pkg_dict.saeri_language %}
     <tr>
       <th scope="row" class="dataset-label">{{ _("Language") }}</th>
@@ -28,10 +22,16 @@
       <td class="dataset-details">{{ pkg_dict.saeri_topic_category }}</td>
     </tr>
   {% endif %}
-  {% if pkg_dict.saeri_temporal_extent %}
+  {% if pkg_dict.saeri_temporal_extent_start %}
     <tr>
-      <th scope="row" class="dataset-label">{{ _("Temporal Extent") }}</th>
-      <td class="dataset-details">{{ pkg_dict.saeri_temporal_extent }}</td>
+      <th scope="row" class="dataset-label">{{ _("Temporal Extent Start") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_temporal_extent_start }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_temporal_extent_end %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Temporal Extent End") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_temporal_extent_end }}</td>
     </tr>
   {% endif %}
   {% if pkg_dict.saeri_dataset_reference_date %}
