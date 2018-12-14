@@ -20,3 +20,9 @@ These files are used to create the drop-down menus when a new dataset is created
 
 There are two fields which re-use the built-in defaults (Description and Tags) but with different names (Abstract and Keywords respectively).
 They are "commented out" in package_basic_fields.html and then the code is copied from the original and reimplemented (with the new label) inside the package_basic_fields_custom block but at the top instead of at the bottom.
+
+# Technical details
+
+`package_basic_fields.html` is hiding the blocks `package_basic_fields_description` and `package_basic_fields_tags` then adding what would have been their contents in a different place on the page.
+
+It uses macros which are defined in `/usr/lib/ckan/default/src/ckan/ckan/templates-bs2/macros/form.html` to create the input elements. It does not (yet) use `form.select` for the drop-down menus, instead it builds them itself. It checks the `data` variable to see which option needs to be selected based on the current value of the field from the dataset, eg. `data['saeri_region'] == "FK"`. Other variables it could use are `pkg` or `app_globals`, eg. `app_globals.site_url`. 
