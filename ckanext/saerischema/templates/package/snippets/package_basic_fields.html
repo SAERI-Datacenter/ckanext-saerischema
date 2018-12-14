@@ -2,6 +2,7 @@
 
 {# This file adds our custom fields to the editing form #}
 {# Original is here: /usr/lib/ckan/default/src/ckan/ckan/templates/package/snippets/package_basic_fields.html #}
+{# The macros are defined in: /usr/lib/ckan/default/src/ckan/ckan/templates-bs2/macros/form.html #}
 
 {# These fields are deliberately empty to override the Description in the original #}
 {# so we can re-implement it below in the correct place on the page #}
@@ -25,13 +26,13 @@
   <label for="field-saeri_region" class="control-label">Region</label>
   <div class="controls">
     <select id="field-saeri_region" name="saeri_region" data-module="autocomplete">
-      <option value="FK">Falkland Islands</option>
-      <option value="SH">Saint Helena</option>
-      <option value="AC">Ascension Island</option>
-      <option value="TA">Tristan da Cunha</option>
-      <option value="GS">South Georgia</option>
-      <option value="MS">Montserrat</option>
-      <option value="UK">UK</option>
+      <option value="FK" {{ "selected " if "FK" == data['saeri_region'] }} >Falkland Islands</option>
+      <option value="SH" {{ "selected " if "SH" == data['saeri_region'] }} >Saint Helena</option>
+      <option value="AC" {{ "selected " if "AC" == data['saeri_region'] }} >Ascension Island</option>
+      <option value="TA" {{ "selected " if "TA" == data['saeri_region'] }} >Tristan da Cunha</option>
+      <option value="GS" {{ "selected " if "GS" == data['saeri_region'] }} >South Georgia</option>
+      <option value="MS" {{ "selected " if "MS" == data['saeri_region'] }} >Montserrat</option>
+      <option value="UK" {{ "selected " if "UK" == data['saeri_region'] }} >UK</option>
     </select>
   </div>
 </div>
@@ -40,25 +41,25 @@
   <label for="field-saeri_topic_category" class="control-label">Topic Category</label>
   <div class="controls">
     <select id="field-saeri_topic_category" name="saeri_topic_category" data-module="autocomplete">
-      <option value="biota">Biota; flora and/or fauna in natural environment</option>
-      <option value="boundaries">Boundaries; legal land descriptions</option>
-      <option value="climatology - meteorology - atmosphere">Climatology - meteorology - atmosphere</option>
-      <option value="economy">Economy; economic activities, conditions and employment</option>
-      <option value="elevation">Elevation; height above or below sea level</option>
-      <option value="environment">Environment; environmental resources, protection and conservation</option>
-      <option value="farming">Farming; animals or plants</option>
-      <option value="geoscientific information">Geoscientific information; earth sciences</option>
-      <option value="health">Health; health services, human ecology, safety</option>
-      <option value="imagery base maps earth cover">Imagery base maps earth cover</option>
-      <option value="inland waters">Inland waters; drainage systems</option>
-      <option value="intelligence - military">Intelligence - Military; bases, structures, activities</option>
-      <option value="location">Location; positional information and services</option>
-      <option value="oceans">Oceans; salt water bodies (not inland waters)</option>
-      <option value="planning cadastre">Planning Cadastre; future land use</option>
-      <option value="society">Society; and culture</option>
-      <option value="structure">Structure; man-made construction</option>
-      <option value="transportation">Transportation; of persons and goods</option>
-      <option value="utilities - communication">Utilities - Communication; energy, water and waste systems and communications infrastructure and services</option>
+      <option value="biota" {{ "selected " if "biota" == data['saeri_topic_category'] }} >Biota; flora and/or fauna in natural environment</option>
+      <option value="boundaries" {{ "selected " if "boundaries" == data['saeri_topic_category'] }} >Boundaries; legal land descriptions</option>
+      <option value="climatology - meteorology - atmosphere" {{ "selected " if "climatology - meteorology - atmosphere" == data['saeri_topic_category'] }} >Climatology - meteorology - atmosphere</option>
+      <option value="economy" {{ "selected " if "economy" == data['saeri_topic_category'] }} >Economy; economic activities, conditions and employment</option>
+      <option value="elevation" {{ "selected " if "elevation" == data['saeri_topic_category'] }} >Elevation; height above or below sea level</option>
+      <option value="environment" {{ "selected " if "environment" == data['saeri_topic_category'] }} >Environment; environmental resources, protection and conservation</option>
+      <option value="farming" {{ "selected " if "farming" == data['saeri_topic_category'] }} >Farming; animals or plants</option>
+      <option value="geoscientific information" {{ "selected " if "geoscientific information" == data['saeri_topic_category'] }} >Geoscientific information; earth sciences</option>
+      <option value="health" {{ "selected " if "health" == data['saeri_topic_category'] }} >Health; health services, human ecology, safety</option>
+      <option value="imagery base maps earth cover" {{ "selected " if "imagery base maps earth cover" == data['saeri_topic_category'] }} >Imagery base maps earth cover</option>
+      <option value="inland waters" {{ "selected " if "inland waters" == data['saeri_topic_category'] }} >Inland waters; drainage systems</option>
+      <option value="intelligence - military" {{ "selected " if "intelligence - military" == data['saeri_topic_category'] }} >Intelligence - Military; bases, structures, activities</option>
+      <option value="location" {{ "selected " if "location" == data['saeri_topic_category'] }} >Location; positional information and services</option>
+      <option value="oceans" {{ "selected " if "oceans" == data['saeri_topic_category'] }} >Oceans; salt water bodies (not inland waters)</option>
+      <option value="planning cadastre" {{ "selected " if "planning cadastre" == data['saeri_topic_category'] }} >Planning Cadastre; future land use</option>
+      <option value="society" {{ "selected " if "society" == data['saeri_topic_category'] }} >Society; and culture</option>
+      <option value="structure" {{ "selected " if "structure" == data['saeri_topic_category'] }} >Structure; man-made construction</option>
+      <option value="transportation" {{ "selected " if "transportation" == data['saeri_topic_category'] }} >Transportation; of persons and goods</option>
+      <option value="utilities - communication" {{ "selected " if "utilities - communication" == data['saeri_topic_category'] }} >Utilities - Communication; energy, water and waste systems and communications infrastructure and services</option>
     </select>
   </div>
 </div>
@@ -78,17 +79,17 @@
   <label for="field-saeri_access_limitations" class="control-label">Access Limitations</label>
   <div class="controls">
     <select id="field-saeri_access_limitations" name="saeri_access_limitations" data-module="autocomplete">
-      <option value="env-govt">Restricted because of environmental sensitivity issue, however data is open to government departments</option>
-      <option value="env-dept">Restricted because of environmental sensitivity issue, however data is open to members of the department</option>
-      <option value="env-rsch">Restricted because of environmental sensitivity issue, however data is open to researchers on the basis of a research agreement</option>
-      <option value="com-govt">Restricted because of commercial sensitivity issue, however data is open to government departments</option>
-      <option value="com-dept">Restricted because of commercial sensitivity issue, however data is open to member of the department</option>
-      <option value="com-rsch">Restricted because of commercial sensitivity issue, however anonymysed data is open to researchers on the basis of a research agreement</option>
-      <option value="mil">Restricted because of defence and military issue</option>
-      <option value="open">Open access</option>
-      <option value="env-com-govt">Restricted because of environmental and commercial sensitivity issues, however data is open to government departments</option>
-      <option value="env-com-dept">Restricted because of environmental and commercial sensitivity issues, however data is open to members of the department</option>
-      <option value="env-com-rsrc">Restricted because of environmental and commercial sensitivity issues, however anonymised data is open to researchers on the basis of a research agreement</option>
+      <option value="env-govt" {{ "selected " if "env-govt" == data['saeri_access_limitations'] }} >Restricted because of environmental sensitivity issue, however data is open to government departments</option>
+      <option value="env-dept" {{ "selected " if "env-dept" == data['saeri_access_limitations'] }} >Restricted because of environmental sensitivity issue, however data is open to members of the department</option>
+      <option value="env-rsch" {{ "selected " if "env-rsch" == data['saeri_access_limitations'] }} >Restricted because of environmental sensitivity issue, however data is open to researchers on the basis of a research agreement</option>
+      <option value="com-govt" {{ "selected " if "com-govt" == data['saeri_access_limitations'] }} >Restricted because of commercial sensitivity issue, however data is open to government departments</option>
+      <option value="com-dept" {{ "selected " if "com-dept" == data['saeri_access_limitations'] }} >Restricted because of commercial sensitivity issue, however data is open to member of the department</option>
+      <option value="com-rsch" {{ "selected " if "com-rsch" == data['saeri_access_limitations'] }} >Restricted because of commercial sensitivity issue, however anonymysed data is open to researchers on the basis of a research agreement</option>
+      <option value="mil" {{ "selected " if "mil" == data['saeri_access_limitations'] }} >Restricted because of defence and military issue</option>
+      <option value="open" {{ "selected " if "open" == data['saeri_access_limitations'] }} >Open access</option>
+      <option value="env-com-govt" {{ "selected " if "env-com-govt" == data['saeri_access_limitations'] }} >Restricted because of environmental and commercial sensitivity issues, however data is open to government departments</option>
+      <option value="env-com-dept" {{ "selected " if "env-com-dept" == data['saeri_access_limitations'] }} >Restricted because of environmental and commercial sensitivity issues, however data is open to members of the department</option>
+      <option value="env-com-rsrc" {{ "selected " if "env-com-rsrc" == data['saeri_access_limitations'] }} >Restricted because of environmental and commercial sensitivity issues, however anonymised data is open to researchers on the basis of a research agreement</option>
     </select>
   </div>
 </div>
@@ -96,13 +97,13 @@
   <label for="field-saeri_use_constraints" class="control-label">Use Constraints</label>
   <div class="controls">
     <select id="field-saeri_use_constraints" name="saeri_use_constraints" data-module="autocomplete">
-      <option value="notcommercial">Not for commercial use</option>
-      <option value="notfornav">Not to be used for navigational purposes</option>
-      <option value="researchonly">To be used for research only</option>
-      <option value="open">Open</option>
-      <option value="openbut">Open, but copyright and/or Intellectual Property Rights apply</option>
-      <option value="restricted">Restricted</option>
-      <option value="restrictedbut">Restricted, but open subject to limitations and prior agreement with responsible organisation. Copyright must be cited</option>
+      <option value="notcommercial" {{ "selected " if "notcommercial" == data['saeri_use_constraints'] }} >Not for commercial use</option>
+      <option value="notfornav" {{ "selected " if "notfornav" == data['saeri_use_constraints'] }} >Not to be used for navigational purposes</option>
+      <option value="researchonly" {{ "selected " if "researchonly" == data['saeri_use_constraints'] }} >To be used for research only</option>
+      <option value="open" {{ "selected " if "open" == data['saeri_use_constraints'] }} >Open</option>
+      <option value="openbut" {{ "selected " if "openbut" == data['saeri_use_constraints'] }} >Open, but copyright and/or Intellectual Property Rights apply</option>
+      <option value="restricted" {{ "selected " if "restricted" == data['saeri_use_constraints'] }} >Restricted</option>
+      <option value="restrictedbut" {{ "selected " if "restrictedbut" == data['saeri_use_constraints'] }} >Restricted, but open subject to limitations and prior agreement with responsible organisation. Copyright must be cited</option>
     </select>
   </div>
 </div>
@@ -117,8 +118,8 @@
   <label for="field-saeri_status" class="control-label">Status</label>
   <div class="controls">
     <select id="field-saeri_status" name="saeri_status" data-module="autocomplete">
-      <option value="INCOMPLETE">Incomplete</option>
-      <option value="COMPLETE">Complete</option>
+      <option value="INCOMPLETE" {{ "selected " if "INCOMPLETE" == data['saeri_status'] }} >Incomplete</option>
+      <option value="COMPLETE" {{ "selected " if "COMPLETE" == data['saeri_status'] }} >Complete</option>
     </select>
   </div>
 </div>

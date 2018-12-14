@@ -1,4 +1,5 @@
 #!/bin/bash
+# 1.01 arb Fri 14 Dec 16:08:50 GMT 2018 - ensure the correct menu entry is selected
 
 # This script reads the metadata*txt files and updates the CKAN
 # metadata entry form and the CKAN dataset display page to handle
@@ -95,9 +96,12 @@ read_options_file()
 {
 	options_input_file="$1"    # read optionvalue<tab>optiontext lines from this file
 	options_output_file="$2"   # append to this file
-	options_id="$3"            # The HTML form name, eg. field-saeri_topic_category
+	options_id="$3"            # The HTML form name, eg. saeri_topic_category
 	options_title="$4"         # The dropdown title, eg. "Topic Category"
 	echo "Creating drop-down menu for $options_title"
+
+	# There is a macro called form.select but we don't yet use it (XXX)
+	#echo "  {{ form.select('${options_id}', label=_('${options_title}'), id='field-${options_id}', value=data.${options_id}, error=errors.${options_id}, classes=['control-medium']) }}" >> "${options_output_file}"
 
 	echo '<div class="form-group control-medium">' >> "${options_output_file}"
 	echo '  <label for="field-'${options_id}'" class="control-label">'${options_title}'</label>' >> "${options_output_file}"
@@ -105,7 +109,9 @@ read_options_file()
 	echo '    <select id="field-'${options_id}'" name="'${options_id}'" data-module="autocomplete">' >> "${options_output_file}"
 
 	cat "${options_input_file}" | while IFS="	" read label description; do
-		echo '      <option value="'${label}'">'${description}'</option>' >> "${options_output_file}"
+		# The quotes are complex here but what we want to end with is:
+		# <option value="done" {{ "selected " if "done" == data['saeri_status'] }} >Status</option>
+		echo '      <option value="'${label}'" {{ "selected " if "'${label}'" == data['"'"${options_id}"'"'] }} >'${description}'</option>' >> "${options_output_file}"
 	done
 
 	echo '    </select>' >> "${options_output_file}"
