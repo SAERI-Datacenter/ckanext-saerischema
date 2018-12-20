@@ -140,6 +140,8 @@ cat $file_input | while IFS="	" read label description; do
 		read_options_file "metadata_form_options_topic_category.txt" "${file_basicfields_update}" "$ident" "$label"
 	elif [ "$label" == "Use Constraints" ]; then
 		read_options_file "metadata_form_options_use_constraints.txt" "${file_basicfields_update}" "$ident" "$label"
+	elif [ "$label" == "Contact Consent" ]; then
+		read_options_file "metadata_form_options_contact_consent.txt" "${file_basicfields_update}" "$ident" "$label"
 	else
 		echo "  {{ form.input('${ident}', label=_('${label}'), id='field-${ident}', placeholder=_('${description}'), value=data.${ident}, error=errors.${ident}, classes=['control-medium']) }}" >> ${file_basicfields_update}
 	fi

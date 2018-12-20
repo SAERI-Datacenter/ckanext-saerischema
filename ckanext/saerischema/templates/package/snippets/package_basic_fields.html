@@ -43,22 +43,22 @@
     <select id="field-saeri_topic_category" name="saeri_topic_category" data-module="autocomplete">
       <option value="biota" {{ "selected " if "biota" == data['saeri_topic_category'] }} >Biota; flora and/or fauna in natural environment</option>
       <option value="boundaries" {{ "selected " if "boundaries" == data['saeri_topic_category'] }} >Boundaries; legal land descriptions</option>
-      <option value="climatology - meteorology - atmosphere" {{ "selected " if "climatology - meteorology - atmosphere" == data['saeri_topic_category'] }} >Climatology - meteorology - atmosphere</option>
+      <option value="atmosphere" {{ "selected " if "atmosphere" == data['saeri_topic_category'] }} >Climatology - meteorology - atmosphere</option>
       <option value="economy" {{ "selected " if "economy" == data['saeri_topic_category'] }} >Economy; economic activities, conditions and employment</option>
       <option value="elevation" {{ "selected " if "elevation" == data['saeri_topic_category'] }} >Elevation; height above or below sea level</option>
       <option value="environment" {{ "selected " if "environment" == data['saeri_topic_category'] }} >Environment; environmental resources, protection and conservation</option>
       <option value="farming" {{ "selected " if "farming" == data['saeri_topic_category'] }} >Farming; animals or plants</option>
-      <option value="geoscientific information" {{ "selected " if "geoscientific information" == data['saeri_topic_category'] }} >Geoscientific information; earth sciences</option>
+      <option value="geoscientific" {{ "selected " if "geoscientific" == data['saeri_topic_category'] }} >Geoscientific information; earth sciences</option>
       <option value="health" {{ "selected " if "health" == data['saeri_topic_category'] }} >Health; health services, human ecology, safety</option>
-      <option value="imagery base maps earth cover" {{ "selected " if "imagery base maps earth cover" == data['saeri_topic_category'] }} >Imagery base maps earth cover</option>
-      <option value="inland waters" {{ "selected " if "inland waters" == data['saeri_topic_category'] }} >Inland waters; drainage systems</option>
-      <option value="intelligence - military" {{ "selected " if "intelligence - military" == data['saeri_topic_category'] }} >Intelligence - Military; bases, structures, activities</option>
+      <option value="imagery" {{ "selected " if "imagery" == data['saeri_topic_category'] }} >Imagery base maps earth cover</option>
+      <option value="inlandwaters" {{ "selected " if "inlandwaters" == data['saeri_topic_category'] }} >Inland waters; drainage systems</option>
+      <option value="intelligence" {{ "selected " if "intelligence" == data['saeri_topic_category'] }} >Intelligence - Military; bases, structures, activities</option>
       <option value="location" {{ "selected " if "location" == data['saeri_topic_category'] }} >Location; positional information and services</option>
-      <option value="oceans" {{ "selected " if "oceans" == data['saeri_topic_category'] }} >Oceans; salt water bodies (not inland waters)</option>
-      <option value="planning cadastre" {{ "selected " if "planning cadastre" == data['saeri_topic_category'] }} >Planning Cadastre; future land use</option>
+      <option value="ocean" {{ "selected " if "ocean" == data['saeri_topic_category'] }} >Oceans; salt water bodies (not inland waters)</option>
+      <option value="cadastre" {{ "selected " if "cadastre" == data['saeri_topic_category'] }} >Planning Cadastre; future land use</option>
       <option value="society" {{ "selected " if "society" == data['saeri_topic_category'] }} >Society; and culture</option>
       <option value="structure" {{ "selected " if "structure" == data['saeri_topic_category'] }} >Structure; man-made construction</option>
-      <option value="transportation" {{ "selected " if "transportation" == data['saeri_topic_category'] }} >Transportation; of persons and goods</option>
+      <option value="transport" {{ "selected " if "transport" == data['saeri_topic_category'] }} >Transportation; of persons and goods</option>
       <option value="utilities - communication" {{ "selected " if "utilities - communication" == data['saeri_topic_category'] }} >Utilities - Communication; energy, water and waste systems and communications infrastructure and services</option>
     </select>
   </div>
@@ -114,6 +114,17 @@
   {{ form.input('saeri_original_title', label=_('Original Title'), id='field-saeri_original_title', placeholder=_('Original file name'), value=data.saeri_original_title, error=errors.saeri_original_title, classes=['control-medium']) }}
   {{ form.input('saeri_metadata_date', label=_('Metadata Date'), id='field-saeri_metadata_date', placeholder=_('Date of original metadata in the form YYYY-MM-DD'), value=data.saeri_metadata_date, error=errors.saeri_metadata_date, classes=['control-medium']) }}
   {{ form.input('saeri_metadata_point_of_contact', label=_('Metadata Point of Contact'), id='field-saeri_metadata_point_of_contact', placeholder=_('Organisation responsible'), value=data.saeri_metadata_point_of_contact, error=errors.saeri_metadata_point_of_contact, classes=['control-medium']) }}
+<div class="form-group control-medium">
+  <label for="field-saeri_contact_consent" class="control-label">Contact Consent</label>
+  <div class="controls">
+    <select id="field-saeri_contact_consent" name="saeri_contact_consent" data-module="autocomplete">
+      <option value="1" {{ "selected " if "1" == data['saeri_contact_consent'] }} >Contact details published</option>
+      <option value="0" {{ "selected " if "0" == data['saeri_contact_consent'] }} >Contact details hidden</option>
+    </select>
+  </div>
+</div>
+  {{ form.input('saeri_unique_resource_id', label=_('Unique Resource ID'), id='field-saeri_unique_resource_id', placeholder=_('eg. FK-XXX-1'), value=data.saeri_unique_resource_id, error=errors.saeri_unique_resource_id, classes=['control-medium']) }}
+  {{ form.input('saeri_research_permit_application_id', label=_('Research Permit Application ID'), id='field-saeri_research_permit_application_id', placeholder=_('Research Permit application number'), value=data.saeri_research_permit_application_id, error=errors.saeri_research_permit_application_id, classes=['control-medium']) }}
 <div class="form-group control-medium">
   <label for="field-saeri_status" class="control-label">Status</label>
   <div class="controls">

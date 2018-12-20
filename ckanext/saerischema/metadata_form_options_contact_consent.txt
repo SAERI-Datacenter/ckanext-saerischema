@@ -1,0 +1,2 @@
+1	Contact details published
+0	Contact details hidden

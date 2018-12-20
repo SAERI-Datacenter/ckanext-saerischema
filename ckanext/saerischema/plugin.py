@@ -147,6 +147,12 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_metadata_point_of_contact': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
+            ,'saeri_contact_consent': [toolkit.get_validator('ignore_missing'),
+                                 toolkit.get_converter('convert_to_extras')]
+            ,'saeri_unique_resource_id': [toolkit.get_validator('ignore_missing'),
+                                 toolkit.get_converter('convert_to_extras')]
+            ,'saeri_research_permit_application_id': [toolkit.get_validator('ignore_missing'),
+                                 toolkit.get_converter('convert_to_extras')]
             ,'saeri_status': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             # SAERISCHEMA_UPDATE_END
@@ -244,6 +250,12 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             ,'saeri_metadata_date': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
             ,'saeri_metadata_point_of_contact': [toolkit.get_converter('convert_from_extras'),
+                            toolkit.get_validator('ignore_missing')]
+            ,'saeri_contact_consent': [toolkit.get_converter('convert_from_extras'),
+                            toolkit.get_validator('ignore_missing')]
+            ,'saeri_unique_resource_id': [toolkit.get_converter('convert_from_extras'),
+                            toolkit.get_validator('ignore_missing')]
+            ,'saeri_research_permit_application_id': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
             ,'saeri_status': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]

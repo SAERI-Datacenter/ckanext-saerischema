@@ -22,4 +22,7 @@ Resource Type	Dataset; Data series; Database; nonGeographicalDataset; report
 Original Title	Original file name
 Metadata Date	Date of original metadata in the form YYYY-MM-DD
 Metadata Point of Contact	Organisation responsible
+Contact Consent	Whether contact details may be published
+Unique Resource ID	eg. FK-XXX-1
+Research Permit Application ID	Research Permit application number
 Status	COMPLETE or INCOMPLETE

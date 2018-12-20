@@ -148,6 +148,24 @@
       <td class="dataset-details">{{ pkg_dict.saeri_metadata_point_of_contact }}</td>
     </tr>
   {% endif %}
+  {% if pkg_dict.saeri_contact_consent %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Contact Consent") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_contact_consent }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_unique_resource_id %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Unique Resource ID") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_unique_resource_id }}</td>
+    </tr>
+  {% endif %}
+  {% if pkg_dict.saeri_research_permit_application_id %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Research Permit Application ID") }}</th>
+      <td class="dataset-details">{{ pkg_dict.saeri_research_permit_application_id }}</td>
+    </tr>
+  {% endif %}
   {% if pkg_dict.saeri_status %}
     <tr>
       <th scope="row" class="dataset-label">{{ _("Status") }}</th>
