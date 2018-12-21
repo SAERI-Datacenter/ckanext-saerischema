@@ -6,8 +6,9 @@ See https://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html
 
 ## Installation
 
-first activate your virtual environment
+first activate your virtual environment, then:
 ```
+pip install pyproj
 cd /usr/lib/ckan/default/src
 git clone https://github.com/SAERI-Datacenter/ckanext-saerischema.git
 cd ckanext-saerischema
