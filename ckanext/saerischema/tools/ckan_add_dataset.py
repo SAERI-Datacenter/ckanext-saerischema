@@ -19,8 +19,8 @@ from ckanapi import RemoteCKAN
 import saerickan
 
 # Configuration
-csv_filename="metadata_FK_export181112_new.csv"
-ckan_ip = "172.16.92.142:5000"
+csv_filename="metadata_FK_export181112_new_arb.csv"
+ckan_ip = "172.16.92.142" # eg. 172.16.92.142:5000 if using paster serve $ini
 api_key = "0317c21c-7d04-48df-8f1b-9989edbd6165"
 user_agent = 'ckanapiexample/1.0 (+http://example.com/my/website)'
 
@@ -176,7 +176,7 @@ ckan = RemoteCKAN('http://%s' % ckan_ip, apikey=api_key, user_agent=user_agent)
 # Process each row
 for row in reader:
 	ckan_add_dataset_from_csv_dict(row)
-	break
+	#break # to only process the first entry
 
 # Close
 RemoteCKAN.close(ckan)
