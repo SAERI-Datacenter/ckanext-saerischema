@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# 1.01 arb Fri 21 Dec 11:08:41 GMT 2018 - handle case when only bottom,left is provided
 # 1.00 arb Thu 20 Dec 13:46:04 GMT 2018
 
 # Functions for SAERI's CKAN installation
@@ -65,8 +66,13 @@ def saerickan_convert_bbox_to_geojson(srs,top,bottom,left,right):
     if top == 0 and bottom == 0 and left == 0 and right == 0:
         return ''
 
-    # Any zero is bad:
-    if top == 0 or bottom == 0 or left == 0 or right == 0:
+    # If only one corner is given then we could make a Point not a Polygon
+    # but we make a Polygon because in reality most data relates to an area.
+    if top == 0 and right == 0 and bottom != 0 and left != 0:
+    	top = bottom
+    	right = left
+    # Otherwise any zero is bad:
+    elif top == 0 or bottom == 0 or left == 0 or right == 0:
         print("ERROR zero in %s %s %s %s %s" % (srs,top,bottom,left,right))
         return ''
 
