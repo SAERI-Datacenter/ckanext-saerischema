@@ -26,3 +26,11 @@ They are "commented out" in package_basic_fields.html and then the code is copie
 `package_basic_fields.html` is hiding the blocks `package_basic_fields_description` and `package_basic_fields_tags` then adding what would have been their contents in a different place on the page.
 
 It uses macros which are defined in `/usr/lib/ckan/default/src/ckan/ckan/templates-bs2/macros/form.html` to create the input elements. It does not (yet) use `form.select` for the drop-down menus, instead it builds them itself. It checks the `data` variable to see which option needs to be selected based on the current value of the field from the dataset, eg. `data['saeri_region'] == "FK"`. Other variables it could use are `pkg` or `c.user` or `c.userobj` or `app_globals`, eg. `app_globals.site_url`. 
+
+The `metadata_form_to_ckan.sh` script creates the `additional_info.html` file which is used to display the dataset contents.
+It handles two fields slightly differently: contact details and research permit application id should be hidden by default.
+Conact details are only visible if consent has been given. In both cases the values will be shown to sysadmin users.
+
+# To do
+
+Convert the Contact Consent from 0 or 1 into words Hidden or Shown.

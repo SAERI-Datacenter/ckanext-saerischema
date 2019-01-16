@@ -14,9 +14,9 @@ You MUST edit the `csv_filename` to be imported if using that (and ensure the fi
 
 ## ckan_add_dataset.py
 
-Run this program to create all the datasets defined in the CSV file `metadata_FK_export181112_new.csv`
+Run this program to create all the datasets defined in the CSV file `metadata_FK_export190107_arb.csv`
 
-It will only do the first one, until you uncomment the `break` line after `ckan_add_dataset_from_csv_dict`
+It will only do the first one, until you edit `only_add_first_entry` from True to False.
 
 It requires that all of the organisations have already been created.
 For that you will need to have run `ckan_add_organisations.py` from

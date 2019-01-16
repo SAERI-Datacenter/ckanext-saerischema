@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 # Create a dataset from a CSV file
+# 1.00 arb Tue 15 Jan 18:35:07 GMT 2019
 #
 # 1. Read CSV file
 # 2. Check that dataset does not already exist (how?)
@@ -19,7 +20,8 @@ from ckanapi import RemoteCKAN
 import saerickan
 
 # Configuration
-csv_filename="metadata_FK_export181112_new_arb.csv"
+only_add_first_entry = False
+csv_filename="metadata_FK_export190107_arb2.csv" # was metadata_FK_export181112_new_arb.csv
 ckan_ip = "172.16.92.142" # eg. 172.16.92.142:5000 if using paster serve $ini
 api_key = "0317c21c-7d04-48df-8f1b-9989edbd6165"
 user_agent = 'ckanapiexample/1.0 (+http://example.com/my/website)'
@@ -27,7 +29,7 @@ user_agent = 'ckanapiexample/1.0 (+http://example.com/my/website)'
 # CSV fields are:
 # ['region', 'organisation', 'id_text', 'unique_resource_id', 'title', 'language', 'abstract', 'topic_category', 'keywords', 'temporal_extent_start', 'temporal_extent_end', 'dataset_reference_date', 'lineage', 'w_long', 's_lat', 'e_long', 'n_lat', 'spatial_reference_system', 'responsible_organisation_name', 'contact_mail_address', 'responsible_party_role', 'frequency_update', 'limitations_access', 'use_constraints', 'data_format', 'accuracy', 'metadata_date', 'metadata_point_contact', 'resource_type', 'original_title', 'id', 'status', 'x_location', 'y_location']
 
-# CSV field mapping to CKAN field name
+# CSV column mapping to CKAN field name
 map_CSV_to_CKAN = {
 	'title': 'title',
 	'abstract': 'notes',
@@ -63,14 +65,28 @@ map_CSV_to_CKAN = {
 
 # -----------------------------------------------------------------------
 # Convert title to name by lowercase, remove spaces, etc
+# The name will be used for the URL so it has to be sanitised.
+# Ultimately it will be unique for each dataset.
 
 def ckan_name_from_title(title):
-	name = re.sub(" +", "-", title.lower()) # replace all spaces by a dash
-	name = re.sub("[^a-z0-9-]", "", name)   # keep only alpha-num and dashes
-	return name[:100]                       # maximum length 100
+	# replace all spaces by a dash
+	name = re.sub(" +", "-", title.lower())
+
+	# keep only alpha-num and dashes
+	name = re.sub("[^a-z0-9-]", "", name)
+
+	# remove spaces from start and end, and squash multiple spaces
+	name = re.sub("^-", "", name)
+	name = re.sub("-$", "", name)
+	name = re.sub("-+", "-", name)
+
+	# return a maximum length of 100
+	return name[:100]
 
 # -----------------------------------------------------------------------
-# 
+# Check if an organisation exists in CKAN, returns True if it does.
+# Uses an exact match so be careful about capital/lowercase.
+# Typically we store organisation 'name' lowercase.
 
 def ckan_check_organisation_exists(org):
 	organisations_data = ckan.action.organization_list(all_fields=True)
@@ -79,13 +95,17 @@ def ckan_check_organisation_exists(org):
 	return org in organisations_list
 
 # -----------------------------------------------------------------------
+# Display the content of a dataset, used only for debugging.
+
 def ckan_get_dataset(ds):
 	packages_results = ckan.action.package_show(include_private=True, include_drafts=True, id=ds)
 	print(packages_results)
 	exit(0)
 
 # -----------------------------------------------------------------------
-# 
+# Check if a dataset exists with the given 'name', returns True if it does.
+# The search includes private and draft datasets.
+# The given name must match exactly.
 
 def ckan_check_dataset_exists(ds):
 	packages_results = ckan.action.package_search(include_private=True, include_drafts=True, q='"%s"' % ds)
@@ -103,13 +123,16 @@ def ckan_check_dataset_exists(ds):
 	return ds_exists
 
 # -----------------------------------------------------------------------
+# Add a dataset to CKAN, or update it if it already exists.
+# The dataset fields are defined in the dictionary called row
+# which has been extracted from one line in a CSV file.
 
 def ckan_add_dataset_from_csv_dict(row):
-	# First check that the organisation already exists in CKAN otherwise we can't add dataset to it
-	# List all fields from CSV
-	name = ckan_name_from_title('Hello (World)')
-	
-	#exit(0)
+	package_create_or_update_action = 'package_create'
+
+	# Convert every field from the CSV into a field for CKAN
+	# Unknown fields (i.e. CSV column names) will be reported.
+	# Some are useless and will be silently ignored.
 	dataset_dict = {}
 	for key in row.keys():
 		if key in map_CSV_to_CKAN:
@@ -138,24 +161,30 @@ def ckan_add_dataset_from_csv_dict(row):
 		dataset_dict['spatial'] = spatial_string
 		#print(dataset_dict['spatial'])
 
-    # DEBUG: print(dataset_dict)
+	# See if organisation already exists (it must)
+	if not ckan_check_organisation_exists(dataset_dict['owner_org']):
+		print("ERROR: Organisation does not exist: '%s'" % dataset_dict['owner_org'])
+		return
 
 	# See if dataset already exists (it must not)
 	if ckan_check_dataset_exists(dataset_dict['name']):
-		print("ERROR: Dataset %s already exists" % dataset_dict['name'])
-		return
+		print("NOTE: Dataset already exists: '%s'" % dataset_dict['name'])
+		package_create_or_update_action = 'package_update'
 
-	# See if organisation already exists (it must)
-	if not ckan_check_organisation_exists(dataset_dict['owner_org']):
-		print("ERROR: Organisation %s does not exist" % dataset_dict['owner_org'])
-		return
+	# Create or update the dataset using package_create/package_update
+	#print("Creating: %s" % dataset_dict['name'])
+	#pprint.pprint(dataset_dict)
+	result = ckan.call_action(package_create_or_update_action, dataset_dict)
+	if 'name' in result:
+		print("OK: %s for %s" % (package_create_or_update_action, dataset_dict['name']))
+	else:
+		print("ERROR: %s failed for %s" % (package_create_or_update_action, dataset_dict['name']))
+	# Should be able to test this? assert response_dict['success'] is True
+	#print("Dataset %s returned:" % package_create_or_update_action)
+	#pprint.pprint(result)
+	# Use the json module to dump the dictionary to a string for posting.
+	##data_string = urllib.quote(json.dumps(dataset_dict))
 
-	# Create the dataset using package_create
-	print("Creating:")
-	pprint.pprint(dataset_dict)
-	result = ckan.call_action('package_create', dataset_dict)
-	print("Dataset package_create returned:")
-	pprint.pprint(result)
 	# Could upload a file at the same time using:
 	# Or by calling the generic call_action function with the actual function name as a parameter:
 	#res = pm.call_action('resource_create',
@@ -176,23 +205,12 @@ ckan = RemoteCKAN('http://%s' % ckan_ip, apikey=api_key, user_agent=user_agent)
 # Process each row
 for row in reader:
 	ckan_add_dataset_from_csv_dict(row)
-	#break # to only process the first entry
+	# Stop after the first row?
+	if only_add_first_entry:
+		break
 
 # Close
 RemoteCKAN.close(ckan)
 fp.close()
 
 exit(0)
-
-# ---------------------
-
-
-# Use the json module to dump the dictionary to a string for posting.
-##data_string = urllib.quote(json.dumps(dataset_dict))
-
-# We'll use the package_create function to create a new dataset.
-##assert response_dict['success'] is True
-
-# package_create returns the created package as its result.
-##created_package = response_dict['result']
-##pprint.pprint(created_package)
