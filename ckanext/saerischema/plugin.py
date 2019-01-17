@@ -1,28 +1,21 @@
+# 1.04 arb Thu 17 Jan 09:57:17 GMT 2019 - use saerickan_convert_bbox_to_geojson to perform the conversion.
+#      Add convert_bbox_to_spatial validator to spatial field.
 # 1.03 arb - create spatial extra
-# 1.02 arb Tue 23 Oct 18:08:18 BST 2018 - added metadata, added logging,
-#          removed unused class
-# 1.01 arb Mon  3 Sep 17:31:01 BST 2018 - added SAERI metadata functions
-#          but not implemented the actual schema yet.
+# 1.02 arb Tue 23 Oct 18:08:18 BST 2018 - added metadata, added logging, removed unused class.
+# 1.01 arb Mon  3 Sep 17:31:01 BST 2018 - added SAERI metadata functions but not implemented the actual schema yet.
+#
 # See: http://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html
-
-# Assumptions: the user only enters numbers in degrees on WGS84 for
-# the N,S,E,W and that they describe a bounding box. The CRS field is ignored.
+# The convert_to/from_extras code is here:
+# /usr/lib/ckan/default/src/ckan/ckan/logic/converters.py
 
 # To do:
 # Extract GeoJSON back to bounding box when displaying ???
-# GeoJSON is:
-# { "type": "Point", "coordinates": [-3.145,53.078] }
-# { "type": "Polygon", "coordinates": [[[2.05827, 49.8625],[2.05827, 55.7447], [-6.41736, 55.7447], [-6.41736, 49.8625], [2.05827, 49.8625]]] }
-# NB. WKT is: POLYGON((lon lat, lon2 lat2, lon3 lat3, lon4 lat4, lon lat))
-# Note that the first and last are the same point.
-#
-# The convert_to/from_extras code is here:
-# /usr/lib/ckan/default/src/ckan/ckan/logic/converters.py
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckan.plugins.toolkit import Invalid
 import logging
+import saerickan
 
 # Doesn't work (is ignored): logging.basicConfig(filename="/tmp/ckan_debug.log", level=logging.DEBUG) # XXX arb ???
 log = logging.getLogger(__name__)
@@ -42,27 +35,21 @@ def SaerischemaPlugin_validator_convert_bbox_to_spatial(key, flattened_data, err
     log.debug("SaerischemaPlugin flattened_data is %s" % (str(flattened_data)))
 
     # Lookup the entered values (warning: might not be validated/converted yet)
-    n = float(flattened_data[('saeri_north_latitude',)])
-    s = float(flattened_data[('saeri_south_latitude',)])
-    w = float(flattened_data[('saeri_west_longitude',)])
-    e = float(flattened_data[('saeri_east_longitude',)])
-    # XXX need to check the SRS field and convert the given coordinates to WGS84
-    # as GeoJSON no longer has a way of specifying the CRS.
+    srs = flattened_data[('saeri_spatial_reference_system',)]
+    n = flattened_data[('saeri_north_latitude',)]
+    s = flattened_data[('saeri_south_latitude',)]
+    w = flattened_data[('saeri_west_longitude',)]
+    e = flattened_data[('saeri_east_longitude',)]
 
     # Construct GeoJSON format from bounding box
     # eg. '{ "type": "Polygon", "coordinates": [[ [ -59.26,-51.94 ], [ -57.62,-51.94 ], [ -57.62,-51.16 ], [ -59.26,-51.16 ], [ -59.26,-51.94 ] ]] }'
-    geojson = '{ "type": "Polygon", "coordinates": [ [ '
-    geojson += '[ %f, %f ], ' % (w,n)
-    geojson += '[ %f, %f ], ' % (e,n)
-    geojson += '[ %f, %f ], ' % (e,s)
-    geojson += '[ %f, %f ], ' % (w,s)
-    geojson += '[ %f, %f ] '  % (w,n)
-    geojson += '] ] }'
+    geojson = saerickan.saerickan_convert_bbox_to_geojson(srs, n, s, w, e)
 
-    log.debug("SaerischemaPlugin N %f" % (n))
-    log.debug("SaerischemaPlugin S %f" % (s))
-    log.debug("SaerischemaPlugin W %f" % (w))
-    log.debug("SaerischemaPlugin E %f" % (e))
+    log.debug("SaerischemaPlugin SRS %s" % (srs))
+    log.debug("SaerischemaPlugin N %s" % (n))
+    log.debug("SaerischemaPlugin S %s" % (s))
+    log.debug("SaerischemaPlugin W %s" % (w))
+    log.debug("SaerischemaPlugin E %s" % (e))
     log.debug("SaerischemaPlugin GeoJSON %s" % (geojson))
 
     # check if spatial exists first
@@ -161,8 +148,10 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         if not 'spatial' in schema:
             log.debug("SaerischemaPlugin _modify_package_schema adding spatial to schema")
             schema.update({'spatial': [toolkit.get_validator('ignore_missing'),
+                                 toolkit.get_converter('convert_bbox_to_spatial'),
                                  toolkit.get_converter('convert_to_extras')]})
         return schema
+
     # The create_package_schema() function is used whenever a new dataset
     # is created, we'll want update the default schema and insert our
     # custom field here. We will fetch the default schema defined in
@@ -265,6 +254,7 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         if not 'spatial' in schema:
             log.debug("SaerischemaPlugin show_package_schema adding spatial to schema")
             schema.update({'spatial': [toolkit.get_converter('convert_from_extras'),
+                            toolkit.get_validator('convert_bbox_to_spatial'),
                             toolkit.get_validator('ignore_missing')]})
         return schema
 
