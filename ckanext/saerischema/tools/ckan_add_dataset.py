@@ -17,6 +17,9 @@ import pprint    # for pprint.pprint
 import csv       # for csv.DictReader
 import re        # for re.sub()
 from ckanapi import RemoteCKAN
+# import our tools from the parent directory
+import sys,os
+sys.path.insert(1, os.path.realpath(os.path.pardir))
 import saerickan
 
 # Configuration
@@ -91,7 +94,6 @@ def ckan_name_from_title(title):
 def ckan_check_organisation_exists(org):
 	organisations_data = ckan.action.organization_list(all_fields=True)
 	organisations_list = [x['name'] for x in organisations_data]
-	#print("Does org %s exist? %s" % (org, org.lower() in organisations_list))
 	return org in organisations_list
 
 # -----------------------------------------------------------------------
@@ -114,12 +116,7 @@ def ckan_check_dataset_exists(ds):
 	# Check for an EXACT match not a substring
 	for package_result in packages_results['results']:
 		if package_result['name'] == ds:
-			#print("EXACT match %s" % ds)
 			ds_exists = True
-		#else:
-		#	print("SUB match %s %s" % (ds, package_result['name']))
-		#print(package_result)
-	#print("Does dataset %s exist? %s" % (ds, ds_exists))
 	return ds_exists
 
 # -----------------------------------------------------------------------
