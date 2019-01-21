@@ -81,10 +81,10 @@ cat $file_input | while IFS="	" read label description; do
 	echo '      <th scope="row" class="dataset-label">{{ _("'${label}'") }}</th>' >> ${file_addinfo_update}
 	# If the item is saeri_research_permit_application_id then it is hidden unless sysadmin
 	if [ $ident == "saeri_research_permit_application_id" ]; then
-		echo '      <td class="dataset-details">{% if c.userobj.sysadmin %}{{ pkg_dict.'${ident}' }}{% else %}Hidden{% endif %}</td>'       >> ${file_addinfo_update}
+		echo '      <td class="dataset-details">{% if c.userobj.sysadmin %}{{ pkg_dict.'${ident}' }}{% else %}<i>Hidden</i>{% endif %}</td>'       >> ${file_addinfo_update}
 	# If the item is contact details then it is hidden without consent
 	elif [ $ident == "saeri_metadata_point_of_contact" ]; then
-		echo '      <td class="dataset-details">{% if pkg_dict.saeri_contact_consent and ( pkg_dict.saeri_contact_consent == 1 or c.userobj.sysadmin ) %}{{ pkg_dict.'${ident}' }}{% else %}Hidden{% endif %}</td>'       >> ${file_addinfo_update}
+		echo '      <td class="dataset-details">{% if pkg_dict.saeri_contact_consent and ( pkg_dict.saeri_contact_consent == 1 or c.userobj.sysadmin ) %}{{ pkg_dict.'${ident}' }}{% else %}<i>Hidden</i>{% endif %}</td>'       >> ${file_addinfo_update}
 	# All other fields are shown directly
 	else
 		echo '      <td class="dataset-details">{{ pkg_dict.'${ident}' }}</td>'       >> ${file_addinfo_update}
