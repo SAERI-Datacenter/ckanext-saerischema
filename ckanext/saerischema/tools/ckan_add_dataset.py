@@ -1,6 +1,10 @@
 #!/usr/bin/env python2
 # Create a dataset from a CSV file
+# 1.01 arb Wed 23 Jan 15:17:20 GMT 2019 - read config from files
 # 1.00 arb Tue 15 Jan 18:35:07 GMT 2019
+#
+# Reads CKAN server IP address from ckan_ip.txt
+# Reads CKAN sysadmin API key from  ckan_api_key.txt
 #
 # 1. Read CSV file
 # 2. Check that dataset does not already exist (how?)
@@ -24,9 +28,9 @@ import saerickan
 
 # Configuration
 only_add_first_entry = False
-csv_filename="metadata_FK_export190107_arb2.csv" # was metadata_FK_export181112_new_arb.csv
-ckan_ip = "172.16.92.142" # eg. 172.16.92.142:5000 if using paster serve $ini
-api_key = "0317c21c-7d04-48df-8f1b-9989edbd6165"
+csv_filename="metadata_FK_export190122.csv"
+#ckan_ip = "172.16.92.142" # eg. 172.16.92.142:5000 if using paster serve $ini
+#api_key = "0317c21c-7d04-48df-8f1b-9989edbd6165"
 user_agent = 'ckanapiexample/1.0 (+http://example.com/my/website)'
 
 # CSV fields are:
@@ -125,6 +129,10 @@ def ckan_check_dataset_exists(ds):
 # which has been extracted from one line in a CSV file.
 
 def ckan_add_dataset_from_csv_dict(row):
+	#print("%s" % (ckan_name_from_title(row['title'])))
+	#print("%s = %s" % (ckan_name_from_title(row['title']), row['unique_resource_id']))
+	#return
+
 	package_create_or_update_action = 'package_create'
 
 	# Convert every field from the CSV into a field for CKAN
@@ -165,7 +173,7 @@ def ckan_add_dataset_from_csv_dict(row):
 
 	# See if dataset already exists (it must not)
 	if ckan_check_dataset_exists(dataset_dict['name']):
-		print("NOTE: Dataset already exists: '%s'" % dataset_dict['name'])
+		print("NOTE: Dataset already exists, will update: '%s'" % dataset_dict['name'])
 		package_create_or_update_action = 'package_update'
 
 	# Create or update the dataset using package_create/package_update
@@ -191,6 +199,10 @@ def ckan_add_dataset_from_csv_dict(row):
 
 # -----------------------------------------------------------------------
 # MAIN
+
+# Read the configuration
+ckan_ip = open("ckan_ip.txt").read().replace('\n','')
+api_key = open("ckan_api_key.txt").read().replace('\n','')
 
 # Read in the CSV file
 fp = open(csv_filename)
