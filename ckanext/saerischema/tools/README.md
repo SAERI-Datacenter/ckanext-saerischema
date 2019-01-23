@@ -8,6 +8,8 @@ You will need to source your virtual environment and run `pip install pyproj` fi
 
 You MUST edit the `csv_filename` to be imported if using that (and ensure the file is up-to-date!). Once complete, remove the actual file from the git repository as it's not public data.
 
+You MUST edit the `ignore_incomplete_datasets` config in the file to decide whether to import Incomplete datasets (those with Status 0).
+
 You MUST create two files: `ckan_ip.txt` contains the IP address of your CKAN server, or it may be the name `localhost`, and `ckan_api_key.txt` contains the API key of your sysadmin account (or an account which has sufficient permissions). The API key can be found once logged into CKAN on your profile page (it's at the bottom of the left-hand column).
 These values were hard-coded into the scripts which caused problems so they are now read from config files.
 
