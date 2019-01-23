@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 # Create a dataset from a CSV file
+# 1.02 arb Wed 23 Jan 15:38:34 GMT 2019 - added config to ignore Incomplete entries (status=0)
 # 1.01 arb Wed 23 Jan 15:17:20 GMT 2019 - read config from files
 # 1.00 arb Tue 15 Jan 18:35:07 GMT 2019
 #
@@ -27,6 +28,7 @@ sys.path.insert(1, os.path.realpath(os.path.pardir))
 import saerickan
 
 # Configuration
+ignore_incomplete_datasets = True
 only_add_first_entry = False
 csv_filename="metadata_FK_export190122.csv"
 #ckan_ip = "172.16.92.142" # eg. 172.16.92.142:5000 if using paster serve $ini
@@ -132,6 +134,11 @@ def ckan_add_dataset_from_csv_dict(row):
 	#print("%s" % (ckan_name_from_title(row['title'])))
 	#print("%s = %s" % (ckan_name_from_title(row['title']), row['unique_resource_id']))
 	#return
+
+	# Ignore incomplete entries, if desired
+	if row['status'] != '1' and ignore_incomplete_datasets:
+		print('Incomplete (ignoring): %s' % row['title'])
+		return
 
 	package_create_or_update_action = 'package_create'
 
