@@ -125,15 +125,6 @@
 </div>
   {{ form.input('saeri_unique_resource_id', label=_('Unique Resource ID'), id='field-saeri_unique_resource_id', placeholder=_('eg. FK-XXX-1'), value=data.saeri_unique_resource_id, error=errors.saeri_unique_resource_id, classes=['control-medium']) }}
   {{ form.input('saeri_research_permit_application_id', label=_('Research Permit Application ID'), id='field-saeri_research_permit_application_id', placeholder=_('Research Permit application number'), value=data.saeri_research_permit_application_id, error=errors.saeri_research_permit_application_id, classes=['control-medium']) }}
-<div class="form-group control-medium">
-  <label for="field-saeri_status" class="control-label">Status</label>
-  <div class="controls">
-    <select id="field-saeri_status" name="saeri_status" data-module="autocomplete">
-      <option value="INCOMPLETE" {{ "selected " if "INCOMPLETE" == data['saeri_status'] }} >Incomplete</option>
-      <option value="COMPLETE" {{ "selected " if "COMPLETE" == data['saeri_status'] }} >Complete</option>
-    </select>
-  </div>
-</div>
   {# SAERISCHEMA_BASICFIELDS_END #}
 
   {# This additional field shows the spatial GeoJSON field #}

@@ -25,4 +25,3 @@ Metadata Point of Contact	Organisation responsible
 Contact Consent	Whether contact details may be published
 Unique Resource ID	eg. FK-XXX-1
 Research Permit Application ID	Research Permit application number
-Status	COMPLETE or INCOMPLETE

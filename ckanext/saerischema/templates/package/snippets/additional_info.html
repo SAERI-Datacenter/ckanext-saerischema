@@ -145,7 +145,7 @@
   {% if pkg_dict.saeri_metadata_point_of_contact %}
     <tr>
       <th scope="row" class="dataset-label">{{ _("Metadata Point of Contact") }}</th>
-      <td class="dataset-details">{% if pkg_dict.saeri_contact_consent and ( pkg_dict.saeri_contact_consent == 1 or c.userobj.sysadmin ) %}{{ pkg_dict.saeri_metadata_point_of_contact }}{% else %}Hidden{% endif %}</td>
+      <td class="dataset-details">{% if pkg_dict.saeri_contact_consent and ( pkg_dict.saeri_contact_consent == 1 or c.userobj.sysadmin ) %}{{ pkg_dict.saeri_metadata_point_of_contact }}{% else %}<i>Hidden</i>{% endif %}</td>
     </tr>
   {% endif %}
   {% if pkg_dict.saeri_contact_consent %}
@@ -163,13 +163,7 @@
   {% if pkg_dict.saeri_research_permit_application_id %}
     <tr>
       <th scope="row" class="dataset-label">{{ _("Research Permit Application ID") }}</th>
-      <td class="dataset-details">{% if c.userobj.sysadmin %}{{ pkg_dict.saeri_research_permit_application_id }}{% else %}Hidden{% endif %}</td>
-    </tr>
-  {% endif %}
-  {% if pkg_dict.saeri_status %}
-    <tr>
-      <th scope="row" class="dataset-label">{{ _("Status") }}</th>
-      <td class="dataset-details">{{ pkg_dict.saeri_status }}</td>
+      <td class="dataset-details">{% if c.userobj.sysadmin %}{{ pkg_dict.saeri_research_permit_application_id }}{% else %}<i>Hidden</i>{% endif %}</td>
     </tr>
   {% endif %}
   {# SAERISCHEMA_ADDINFO_END #}
