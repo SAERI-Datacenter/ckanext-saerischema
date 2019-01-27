@@ -1,4 +1,9 @@
 #!/bin/bash
+# 1.03 arb Sat 26 Jan 23:33:44 GMT 2019 - hide more contact details:
+#      saeri_metadata_point_of_contact
+#      saeri_responsible_organisation_name
+#      saeri_contact_mail_address
+#      saeri_responsible_party_role
 # 1.02 arb Wed 16 Jan 11:27:55 GMT 2019 - only show research permit id to sysadmin
 #      and only show contact details if consent given or if sysadmin.
 # 1.01 arb Fri 14 Dec 16:08:50 GMT 2018 - ensure the correct menu entry is selected
@@ -83,7 +88,10 @@ cat $file_input | while IFS="	" read label description; do
 	if [ $ident == "saeri_research_permit_application_id" ]; then
 		echo '      <td class="dataset-details">{% if c.userobj.sysadmin %}{{ pkg_dict.'${ident}' }}{% else %}<i>Hidden</i>{% endif %}</td>'       >> ${file_addinfo_update}
 	# If the item is contact details then it is hidden without consent
-	elif [ $ident == "saeri_metadata_point_of_contact" ]; then
+	elif [ $ident == "saeri_metadata_point_of_contact" \
+		-o $ident == "saeri_responsible_organisation_name" \
+		-o $ident == "saeri_contact_mail_address" \
+		-o $ident == "saeri_responsible_party_role" ]; then
 		echo '      <td class="dataset-details">{% if pkg_dict.saeri_contact_consent and ( pkg_dict.saeri_contact_consent == 1 or c.userobj.sysadmin ) %}{{ pkg_dict.'${ident}' }}{% else %}<i>Hidden</i>{% endif %}</td>'       >> ${file_addinfo_update}
 	# All other fields are shown directly
 	else
