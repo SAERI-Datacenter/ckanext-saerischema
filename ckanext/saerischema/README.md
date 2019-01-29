@@ -1,18 +1,31 @@
-# metadata_form_blank.xlsx
+# Modifying the schema
+
+Run `./metadata_form_to_ckan.sh` to update the schema.
+It can be run more than once safely.
+
+It reads the input file `metadata_form_fields.txt` which describes the additional fields in the schema (see below for file format).
+
+It updates the content inside `plugin.py` (adding code to create the schema fields),
+`templates/package/snippets/additional_info.html` (displaying the fields on the dataset page), and
+`templates/package/snippets/package_basic_fields.html` (editing fields on the dataset create/update page).
+
+It handles these schema fields as special cases: `Region`, `Responsible Party Role`, `Access Limitations`, `Status`, `Topic Category`, `Use Constraints`, `Contact Consent`. They all require a drop-down menu, so the list of options to put in each menu has to be defined somewhere. The respective files are metadata_form_options...txt (eg. `metadata_form_options_region.txt`).
+
+## metadata_form_blank.xlsx
 
 The definition of the metadata fields. This was used to create metadata_form_fields.txt and the metadata_form_options files. If you change this spreadsheet you should also change those files.
 
-# metadata_form_to_ckan.sh
+## metadata_form_to_ckan.sh
 
 Script to read metadata_form_fields.txt and metadata_form_options files and update the CKAN extension files (plugin.py etc) to display and store the metadata fields when a dataset is created/updated/displayed. The updated files are plugin.py, templates/package/snippets/additional_info.html, templates/package/snippets/package_basic_fields.html, templates/package/snippets/package_metadata_fields.html. The original files are in /usr/lib/ckan/default/src/ckan/ckan/templates/package/snippets.
 
-# metadata_form_fields.txt
+## metadata_form_fields.txt
 
 The metadata field names, one per line, tab separated label and description.
 Do not change these once you've started populating CKAN otherwise the content of the database will be inconsistent.
 Note that Title, Keyword and Abstract have been removed because CKAN already has these built in.
 
-# metadata_form_options_*.txt
+## metadata_form_options_*.txt
 
 These files are used to create the drop-down menus when a new dataset is created. They are one option per line, tab separated id and label.
 

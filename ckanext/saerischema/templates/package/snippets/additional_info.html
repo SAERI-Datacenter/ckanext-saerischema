@@ -80,19 +80,19 @@
   {% if pkg_dict.saeri_responsible_organisation_name %}
     <tr>
       <th scope="row" class="dataset-label">{{ _("Responsible Organisation Name") }}</th>
-      <td class="dataset-details">{% if pkg_dict.saeri_contact_consent and ( pkg_dict.saeri_contact_consent == 1 or c.userobj.sysadmin ) %}{{ pkg_dict.saeri_responsible_organisation_name }}{% else %}<i>Hidden</i>{% endif %}</td>
+      <td class="dataset-details">{% if c.userobj.sysadmin or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == 1 ) %}{{ pkg_dict.saeri_responsible_organisation_name }}{% else %}<i>Hidden</i>{% endif %}</td>
     </tr>
   {% endif %}
   {% if pkg_dict.saeri_contact_mail_address %}
     <tr>
       <th scope="row" class="dataset-label">{{ _("Contact Mail Address") }}</th>
-      <td class="dataset-details">{% if pkg_dict.saeri_contact_consent and ( pkg_dict.saeri_contact_consent == 1 or c.userobj.sysadmin ) %}{{ pkg_dict.saeri_contact_mail_address }}{% else %}<i>Hidden</i>{% endif %}</td>
+      <td class="dataset-details">{% if c.userobj.sysadmin or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == 1 ) %}{{ pkg_dict.saeri_contact_mail_address }}{% else %}<i>Hidden</i>{% endif %}</td>
     </tr>
   {% endif %}
   {% if pkg_dict.saeri_responsible_party_role %}
     <tr>
       <th scope="row" class="dataset-label">{{ _("Responsible Party Role") }}</th>
-      <td class="dataset-details">{% if pkg_dict.saeri_contact_consent and ( pkg_dict.saeri_contact_consent == 1 or c.userobj.sysadmin ) %}{{ pkg_dict.saeri_responsible_party_role }}{% else %}<i>Hidden</i>{% endif %}</td>
+      <td class="dataset-details">{% if c.userobj.sysadmin or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == 1 ) %}{{ pkg_dict.saeri_responsible_party_role }}{% else %}<i>Hidden</i>{% endif %}</td>
     </tr>
   {% endif %}
   {% if pkg_dict.saeri_access_limitations %}
@@ -146,7 +146,7 @@
   {% if pkg_dict.saeri_metadata_point_of_contact %}
     <tr>
       <th scope="row" class="dataset-label">{{ _("Metadata Point of Contact") }}</th>
-      <td class="dataset-details">{% if pkg_dict.saeri_contact_consent and ( pkg_dict.saeri_contact_consent == 1 or c.userobj.sysadmin ) %}{{ pkg_dict.saeri_metadata_point_of_contact }}{% else %}<i>Hidden</i>{% endif %}</td>
+      <td class="dataset-details">{% if c.userobj.sysadmin or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == 1 ) %}{{ pkg_dict.saeri_metadata_point_of_contact }}{% else %}<i>Hidden</i>{% endif %}</td>
     </tr>
   {% endif %}
   {% if pkg_dict.saeri_contact_consent %}

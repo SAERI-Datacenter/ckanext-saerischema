@@ -1,4 +1,5 @@
 #!/bin/bash
+# 1,04 arb Tue 29 Jan 11:44:09 GMT 2019 - change Hidden logic so sysadmin always allowed even if consent field absent
 # 1.03 arb Sat 26 Jan 23:33:44 GMT 2019 - hide more contact details:
 #      saeri_metadata_point_of_contact
 #      saeri_responsible_organisation_name
@@ -92,7 +93,7 @@ cat $file_input | while IFS="	" read label description; do
 		-o $ident == "saeri_responsible_organisation_name" \
 		-o $ident == "saeri_contact_mail_address" \
 		-o $ident == "saeri_responsible_party_role" ]; then
-		echo '      <td class="dataset-details">{% if pkg_dict.saeri_contact_consent and ( pkg_dict.saeri_contact_consent == 1 or c.userobj.sysadmin ) %}{{ pkg_dict.'${ident}' }}{% else %}<i>Hidden</i>{% endif %}</td>'       >> ${file_addinfo_update}
+		echo '      <td class="dataset-details">{% if c.userobj.sysadmin or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == 1 ) %}{{ pkg_dict.'${ident}' }}{% else %}<i>Hidden</i>{% endif %}</td>'       >> ${file_addinfo_update}
 	# All other fields are shown directly
 	else
 		echo '      <td class="dataset-details">{{ pkg_dict.'${ident}' }}</td>'       >> ${file_addinfo_update}
