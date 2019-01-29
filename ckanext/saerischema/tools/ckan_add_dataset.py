@@ -1,5 +1,7 @@
 #!/usr/bin/env python2
 # Create a dataset from a CSV file
+# 1.04 arb Tue 29 Jan 11:44:09 GMT 2019 - csv_filename can be first parameter
+# 1.03 arb Mon Jan 28 18:17:26 GMT 2019 - add dataset to group
 # 1.02 arb Wed 23 Jan 15:38:34 GMT 2019 - added config to ignore Incomplete entries (status=0)
 # 1.01 arb Wed 23 Jan 15:17:20 GMT 2019 - read config from files
 # 1.00 arb Tue 15 Jan 18:35:07 GMT 2019
@@ -7,7 +9,8 @@
 # Reads CKAN server IP address from ckan_ip.txt
 # Reads CKAN sysadmin API key from  ckan_api_key.txt
 #
-# 1. Read CSV file
+# 0. Read CSV file mapping topic_category to group(theme) name
+# 1. Read CSV file containing list of datasets
 # 2. Check that dataset does not already exist (how?)
 # 3. Map from the CSV columns to the CKAN fields
 # 4. Check that the organisation already exists
@@ -28,11 +31,12 @@ sys.path.insert(1, os.path.realpath(os.path.pardir))
 import saerickan
 
 # Configuration
+# ckan_ip.txt = "172.16.92.142" # eg. 172.16.92.142:5000 if using paster serve $ini
+# ckan_api_key.txt = "0317c21c-7d04-48df-8f1b-9989edbd6165"
 ignore_incomplete_datasets = True
 only_add_first_entry = False
-csv_filename="metadata_FK_export190122.csv"
-#ckan_ip = "172.16.92.142" # eg. 172.16.92.142:5000 if using paster serve $ini
-#api_key = "0317c21c-7d04-48df-8f1b-9989edbd6165"
+csv_filename="metadata_FK_export190127.csv"
+group_csv_filename="../../../../ckanext-saeritheme/ckanext/saeritheme/tools/topic_categories.csv"
 user_agent = 'ckanapiexample/1.0 (+http://example.com/my/website)'
 
 # CSV fields are:
@@ -91,6 +95,23 @@ def ckan_name_from_title(title):
 
 	# return a maximum length of 100
 	return name[:100]
+
+# -----------------------------------------------------------------------
+# Read the group definition CSV file to map from
+# our topic_category column to a group (theme) name.
+# The topic_category column is in the csvname column in this CSV.
+# CSV is:
+# csvname,group,title,description,logo
+# Returns a dictionary.
+
+def create_mapping_topic_category_to_group():
+	group_csv_fp = open(group_csv_filename)
+	group_csv_reader = csv.DictReader(group_csv_fp)
+	topic_category_to_group_dict = {}
+	for group_row in group_csv_reader:
+		topic_category_to_group_dict[group_row['csvname']] = group_row['group']
+	group_csv_fp.close()
+	return topic_category_to_group_dict
 
 # -----------------------------------------------------------------------
 # Check if an organisation exists in CKAN, returns True if it does.
@@ -162,6 +183,12 @@ def ckan_add_dataset_from_csv_dict(row):
 	# Lower-case organisation name
 	dataset_dict['owner_org'] = dataset_dict['owner_org'].lower()
 
+	# Group (theme) membership
+	# Take the topic_category, map to the name of an existing group
+	# put it into a dictionary and put that into a list (assuming only one group)
+	if row['topic_category']:
+		dataset_dict['groups'] = [ { 'name': topic_category_to_group_dict[row['topic_category']] } ]
+
 	# Spatial component is GeoJSON converted from bounding box coords
 	spatial_string = saerickan.saerickan_convert_bbox_to_geojson(
 		dataset_dict['saeri_spatial_reference_system'],
@@ -207,9 +234,16 @@ def ckan_add_dataset_from_csv_dict(row):
 # -----------------------------------------------------------------------
 # MAIN
 
+# CSV filename is first parameter
+if len(sys.argv) > 1:
+	csv_filename = sys.argv[1]
+
 # Read the configuration
 ckan_ip = open("ckan_ip.txt").read().replace('\n','')
 api_key = open("ckan_api_key.txt").read().replace('\n','')
+
+# Read CSV from theme plugin
+topic_category_to_group_dict = create_mapping_topic_category_to_group()
 
 # Read in the CSV file
 fp = open(csv_filename)
