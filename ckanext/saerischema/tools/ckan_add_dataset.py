@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 # Create a dataset from a CSV file
+# 1.05 arb Wed 30 Jan 10:18:31 GMT 2019 - remove apostrophes from keywords
 # 1.04 arb Tue 29 Jan 11:44:09 GMT 2019 - csv_filename can be first parameter
 # 1.03 arb Mon Jan 28 18:17:26 GMT 2019 - add dataset to group
 # 1.02 arb Wed 23 Jan 15:38:34 GMT 2019 - added config to ignore Incomplete entries (status=0)
@@ -182,6 +183,9 @@ def ckan_add_dataset_from_csv_dict(row):
 
 	# Lower-case organisation name
 	dataset_dict['owner_org'] = dataset_dict['owner_org'].lower()
+
+	# Remove apostrophes from the keywords (tag_string)
+	dataset_dict['tag_string'] = re.sub("'", "", dataset_dict['tag_string'])
 
 	# Group (theme) membership
 	# Take the topic_category, map to the name of an existing group
