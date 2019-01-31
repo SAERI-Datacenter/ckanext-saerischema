@@ -47,3 +47,65 @@ Conact details are only visible if consent has been given. In both cases the val
 # To do
 
 Convert the Contact Consent from 0 or 1 into words Hidden or Shown.
+
+# Debugging
+
+First make the log files readable `sudo chmod go+r /var/log/apache2/*`
+
+Now check the end of the file `/var/log/apache2/ckan_default.error.log`
+if the error is not in the last few lines then go further back,
+and it might be immediately before the line `CGI Variables`
+(note: which is before `WSGI Variables`).
+
+## Turn on debug:
+
+You can set `debug = true` in the config file but you will probably need to edit
+the `ckan_default.conf` file, see below. Once done and apache restarted you can
+load a page and see a debug section in the footer to display information about
+how the page was constructed. A better way to debug is to run a test server, not
+apache, using paster, see below.
+
+Change `debug = true` and `ckan.site_url` to have the debug port number.
+
+```
+crudini --set --inplace $ini DEFAULT debug true
+crudini --set --inplace $ini app:main ckan.site_url http://172.16.92.142:5000
+```
+
+Edit /etc/apache2/sites-enabled/ckan_default.conf
+and remove `processes=2 threads=15` from the line
+`WSGIDaemonProcess ckan_default display-name=ckan_default processes=2 threads=15`
+
+Now you can start a debug web server using
+```
+cd /usr/lib/ckan/default/src/ckan
+paster serve /etc/ckan/default/production.ini
+```
+and connect to it by pointing your web browser at port :5000
+
+## Turn off debug:
+
+```
+crudini --set --inplace $ini DEFAULT debug false
+crudini --set --inplace $ini app:main ckan.site_url http://172.16.92.142
+```
+
+Edit /etc/apache2/sites-enabled/ckan_default.conf
+and replace the line
+`WSGIDaemonProcess ckan_default display-name=ckan_default processes=2 threads=15`
+
+## Debugging the code
+
+```
+import pdb
+pdb.set_trace() # at the place where you want a breakpoint
+```
+or
+```
+import ipdb
+ipdb.set_trace() # at the place where you want a breakpoint
+```
+
+You will need the paster serve console open.
+It will display a URL where you can see the stacktrace, variables, and run commands.
+
