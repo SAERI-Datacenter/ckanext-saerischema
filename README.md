@@ -1,8 +1,12 @@
 # ckanext-saerischema
 
 This is a CKAN plugin to implement additional metadata fields (schema) specifically for SAERI.
-It displays the fields for entering metadata on the dataset create/update page and displays the (non-empty) fields on the dataset display page. Some of the SAERI fields re-use existing CKAN metadata fields (eg. Description which is renamed to Abstract, and Tags which is renamed to Keywords) and the rest are additional. One unique feature is the bounding box which the user enters into the four fields (east, west, north, south) is converted into a GeoJSON format and stored in the CKAN spatial field which allows the user to search for datasets by specifying an area on a map.
-See https://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html
+
+It displays the fields for entering metadata on the dataset create/update page and displays the (non-empty) fields on the dataset display page. Some of the SAERI fields re-use existing CKAN metadata fields (eg. Description which is renamed to Abstract, Tags which is renamed to Keywords, Topic Category becomes a CKAN group which is displayed as Theme) and the rest are additional.
+
+One unique feature is the bounding box which the user enters into the four fields (east, west, north, south) is converted into a GeoJSON format and stored in the CKAN spatial field which allows the user to search for datasets by specifying an area on a map. The Spatial Reference System is used to determine whether the coordinates are lat,long degrees or metres in a UTM projection. At the moment only certain SRS are supported: "WGS84", "UTM 21S WGS84" (becomes epsg:32721), "UTM 28S WGS84" (becomes epsg:32728), "World Mercator WGS84 Datum" (becomes epsg:3395), "TM CM 60W" (becomes epsg:6703).
+
+It has the ability to restrict download access for the resources of a dataset to members of an organisation or specific named users. Note that the list of users must be comma-separated without any spaces.  This feature has a dependency on the 'restricted plugin (see below for installation).
 
 ## Installation
 
@@ -59,3 +63,4 @@ The set of additional fields (i.e. additional to those which CKAN already provid
 
 There are some HTML files in `ckanext/saerischema/templates/package/snippets` but these should *not* be edited. They have been customised to display certain fields in the correct place on the page but most of the contents are modified automatically by the script described above.
 
+See https://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html
