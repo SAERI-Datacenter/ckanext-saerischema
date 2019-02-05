@@ -6,7 +6,7 @@ See https://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html
 
 ## Installation
 
-first activate your virtual environment, then:
+First activate your virtual environment, then:
 ```
 pip install pyproj
 cd /usr/lib/ckan/default/src
@@ -14,12 +14,37 @@ git clone https://github.com/SAERI-Datacenter/ckanext-saerischema.git
 cd ckanext-saerischema
 python setup.py develop
 ```
-then add `saerischema` to the `ckan.plugins` line in your ckan config file and restart the web server with sudo service apache2 restart
+then add `saerischema` to the `ckan.plugins` line in your ckan config file and restart the web server with `sudo service apache2 restart`
+
+Now the `restricted` extension needs to be installed:
+```
+cd /usr/lib/ckan/default/src
+git clone https://github.com/EnviDat/ckanext-restricted.git
+cd ckanext-restricted
+python setup.py develop
+pip install -r dev-requirements.txt
+```
+then add `restricted` to the `ckan.plugins` line in your ckan config file and restart the web server with `sudo service apache2 restart`
+
+See the CKAN documentation for installing the `spatial` plugins.
+
+## Configuration
+
+The `restricted` plugin needs to be able to send emails so please make sure you have configured CKAN appropriately, see
+https://docs.ckan.org/en/2.8/maintaining/configuration.html?#email-settings
 
 ## Updating
 
+Update your local copy of the schema extention using:
 ```
 cd /usr/lib/ckan/default/src/ckanext-saerischema
+git pull
+sudo service apache2 restart
+```
+
+In the unlikely event that the restricted plugin has been updated then you can update your local copy:
+```
+cd /usr/lib/ckan/default/src/ckanext-restricted
 git pull
 sudo service apache2 restart
 ```

@@ -1,20 +1,34 @@
+# 1.07 arb Wed Jan 23 11:18:58 GMT 2019 - added two validators to handle 'restricted' field of resource metadata
+# 1.06 arb Mon Jan 21 15:50:00 GMT 2019 - added mime type for GeoJSON
+# 1.05 arb Thu Jan 17 17:23:23 GMT 2019 - added level and allowed_users for restricted plugin
 # 1.04 arb Thu 17 Jan 09:57:17 GMT 2019 - use saerickan_convert_bbox_to_geojson to perform the conversion.
 #      Add convert_bbox_to_spatial validator to spatial field.
 # 1.03 arb - create spatial extra
 # 1.02 arb Tue 23 Oct 18:08:18 BST 2018 - added metadata, added logging, removed unused class.
 # 1.01 arb Mon  3 Sep 17:31:01 BST 2018 - added SAERI metadata functions but not implemented the actual schema yet.
-#
-# See: http://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html
+
+# This plugin extends the default CKAN schema with new metadata fields.
+# It also contains code to update the 'spatial' metadata with a
+# GeoJSON value that is calculated from the N,S,W,E extents entered.
+# It also extends the default CKAN schema for resources to add the
+# fields required by the 'restricted' plugin allowing for resources
+# to be restricted to certain users.
+
+# See the documentation:
+# http://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html
 # The convert_to/from_extras code is here:
 # /usr/lib/ckan/default/src/ckan/ckan/logic/converters.py
-
-# To do:
-# Extract GeoJSON back to bounding box when displaying ???
+# Adding resource metadata:
+# https://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html#adding-custom-fields-to-resources
+# For adding a mime type:
+# https://docs.ckan.org/en/2.8/maintaining/filestore.html#filestore-api
+# GeoJSON mimetype: https://tools.ietf.org/html/rfc7946
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckan.plugins.toolkit import Invalid
 import logging
+import mimetypes
 import saerickan
 
 # Doesn't work (is ignored): logging.basicConfig(filename="/tmp/ckan_debug.log", level=logging.DEBUG) # XXX arb ???
@@ -30,6 +44,20 @@ log = logging.getLogger(__name__)
 # 4 param (key, flattened_data, errors, context) return None as it can
 #  update stuff
 # See https://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html#custom-validators
+
+# flattened_data for a dataset may look like this:
+#   ('extras', 27, 'key'): 'saeri_west_longitude',
+#   ('saeri_west_longitude',): u'-11',
+# the resources of the dataset are like this:
+# eg. to get the id of the first (0) resource:
+#   ('resources', 0, 'id'): u'b96f04cb-00ab-48aa-8f85-4243e29ffa73',
+# the extras are like this:
+#   ('__extras',): {
+#     'num_resources': 1,
+#     'metadata_modified': '2019-01-23T12:59:53.892922',
+#      organization': { 'title':'My Organisation' }
+#   }
+
 def SaerischemaPlugin_validator_convert_bbox_to_spatial(key, flattened_data, errors, context):
     log.debug("SaerischemaPlugin convert_bbox_to_spatial")
     log.debug("SaerischemaPlugin flattened_data is %s" % (str(flattened_data)))
@@ -61,6 +89,24 @@ def SaerischemaPlugin_validator_convert_bbox_to_spatial(key, flattened_data, err
     flattened_data[('spatial',)] = geojson
 
 
+def SaerischemaPlugin_validator_convert_level_to_restricted(key, flattened_data, errors, context):
+    log.debug("SaerischemaPlugin_validator_convert_level_to_restricted flattened_data is %s" % (str(flattened_data)))
+    lv = flattened_data[('resources', 0, 'level')]
+    au = flattened_data[('resources', 0, 'allowed_users')]
+    #rr = flattened_data[('restricted',)]
+    #log.debug("XXX level is %s" % lv)
+    #log.debug("XXX restricted is %s" % rr)
+    #log.debug("XXX level is %s" % lv)
+    #log.debug("XXX users is %s" % au)
+    json = '{\"allowed_users\": \"%s\", \"level\": \"%s\"}' % (au, lv)
+    log.debug("SaerischemaPlugin_validator_convert_level_to_restricted setting restricted to %s" % json)
+    flattened_data[('resources', 0, 'restricted')] = json
+
+
+def SaerischemaPlugin_validator_convert_level_from_restricted(key, flattened_data, errors, context):
+    log.debug("SaerischemaPlugin_validator_convert_level_from_restricted flattened_data is %s" % (str(flattened_data)))
+
+
 # ---------------------------------------------------------------------
 # Our class contains the additional schema elements required for our metadata
 
@@ -75,8 +121,10 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
 
     # Return the list of validators which we supply (functions must be global)
     def get_validators(self):
-        log.debug("SaerischemaPlugin get_validators")
-        return { 'convert_bbox_to_spatial': SaerischemaPlugin_validator_convert_bbox_to_spatial }
+        log.debug("SaerischemaPlugin get_validators returning 3 incl bbox and level")
+        return { 'convert_bbox_to_spatial':  SaerischemaPlugin_validator_convert_bbox_to_spatial,
+            'convert_level_to_restricted':   SaerischemaPlugin_validator_convert_level_to_restricted,
+            'convert_level_from_restricted': SaerischemaPlugin_validator_convert_level_from_restricted }
 
 
     # Helper function to prevent duplicated code
@@ -140,9 +188,14 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_research_permit_application_id': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
-            ,'saeri_status': [toolkit.get_validator('ignore_missing'),
-                                 toolkit.get_converter('convert_to_extras')]
             # SAERISCHEMA_UPDATE_END
+        })
+        # Add two fields to the resource schema for the restricted plugin
+        log.debug("SaerischemaPlugin _modify_package_schema adding restricted to resources schema")
+        schema['resources'].update({
+            'level': [ toolkit.get_validator('ignore_missing'), toolkit.get_validator('convert_level_to_restricted') ]
+            ,'allowed_users': [ toolkit.get_validator('ignore_missing') ]
+            ,'restricted': [ toolkit.get_validator('ignore_missing') ]
         })
         # If the schema doesn't already have a 'spatial' extra then add it now
         if not 'spatial' in schema:
@@ -246,15 +299,21 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                             toolkit.get_validator('ignore_missing')]
             ,'saeri_research_permit_application_id': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
-            ,'saeri_status': [toolkit.get_converter('convert_from_extras'),
-                            toolkit.get_validator('ignore_missing')]
             # SAERISCHEMA_SHOW_END
+        })
+        # Add two fields to the resource schema for the restricted plugin
+        # XXX no use of convert_from_restricted at this stage
+        log.debug("SaerischemaPlugin show_package_schema adding restricted to resources schema")
+        schema['resources'].update({
+            'level': [ toolkit.get_validator('ignore_missing') ]
+            ,'allowed_users': [ toolkit.get_validator('ignore_missing') ]
+            ,'restricted': [ toolkit.get_validator('ignore_missing') ]
         })
         # If the schema doesn't already have a 'spatial' extra then add it now
         if not 'spatial' in schema:
             log.debug("SaerischemaPlugin show_package_schema adding spatial to schema")
             schema.update({'spatial': [toolkit.get_converter('convert_from_extras'),
-                            toolkit.get_validator('convert_bbox_to_spatial'),
+                            toolkit.get_validator('convert_bbox_to_spatial'), # XXX should this be here???
                             toolkit.get_validator('ignore_missing')]})
         return schema
 
@@ -287,4 +346,5 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         toolkit.add_template_directory(config, 'templates')
         toolkit.add_public_directory(config, 'public')
         toolkit.add_resource('fanstatic', 'saerischema')
+        mimetypes.add_type('application/geo+json', '.geojson') # As per RFC, not application/json
         log.debug("SaerischemaPlugin update_config called")

@@ -1,0 +1,27 @@
+{% ckan_extends %}
+{# This snippet adds the 'level' and 'allowed_users' fields to the page for editing the metadata of a resource /resource_edit/ #}
+{# It extends ckan/templates/package/snippets/resource_form.html #}
+
+{% block basic_fields %}
+
+{# Include the original basic_fields block #}
+{{ super() }}
+
+{# Add the two additional ones required by ckanext_restricted #}
+
+{# SAERISCHEMA_RESFORM_START #}
+{{ form.select('level', id='field-level', label=_('Access Constraint'),
+options=[ {'name':'public', 'value':'public', 'text':'Public'},
+{'name':'registered', 'value':'registered', 'text':'Registered Users'},
+{'name':'any_organization', 'value':'any_organization', 'text':'Any Organization Members (Trusted Users)'},
+{'name':'same_organization', 'value':'same_organization', 'text':'Same Organization Members'},
+{'name':'only_allowed_users', 'value':'only_allowed_users', 'text':'Allowed Users Only'} ],
+selected=data['level'],
+classes=['control-medium']) }}
+
+{# This should only allow valid usernames to be entered and should auto-complete #}
+{{ form.input('allowed_users', id='field-allowed-users', label=_('Allowed Usernames'), value=data['allowed_users']) }}
+{# SAERISCHEMA_RESFORM_END #}
+
+{% endblock %}
+

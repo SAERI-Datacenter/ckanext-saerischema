@@ -1,6 +1,5 @@
 Region	Where data was collected: FK, SH, AC, TD, SG
 Language	Language code: eng, spa, fre, ita, ger
-Topic Category	Please see documents for a description of this field
 Temporal Extent Start	Start date in the form YYYY-MM-DD or YYYY
 Temporal Extent End	End date in the form YYYY-MM-DD or YYYY
 Dataset Reference Date	Date that identifies the currency of the publication data

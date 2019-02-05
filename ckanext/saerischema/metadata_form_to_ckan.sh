@@ -147,6 +147,7 @@ cat $file_input | while IFS="	" read label description; do
 
 	# We normally use the "form.input" macro defined in ckan/templates/macros/form.html
 	# but there is no macro for dropdown menus so we use our own function defined above.
+	# Actually there is but we haven't migrated to use it yet.
 	if [ "$label" == "Region" ]; then
 		read_options_file "metadata_form_options_region.txt" "${file_basicfields_update}" "$ident" "$label"
 	# Responsible Party Role might need multiple values so don't constrain it with a drop-down menu
@@ -154,10 +155,12 @@ cat $file_input | while IFS="	" read label description; do
 	#	read_options_file "metadata_form_options_resp_party_role.txt" "${file_basicfields_update}" "$ident" "$label"
 	elif [ "$label" == "Access Limitations" ]; then
 		read_options_file "metadata_form_options_access_limitations.txt" "${file_basicfields_update}" "$ident" "$label"
-	elif [ "$label" == "Status" ]; then
-		read_options_file "metadata_form_options_status.txt" "${file_basicfields_update}" "$ident" "$label"
-	elif [ "$label" == "Topic Category" ]; then
-		read_options_file "metadata_form_options_topic_category.txt" "${file_basicfields_update}" "$ident" "$label"
+	# Status is no longer included because we don't import Incomplete records
+	#elif [ "$label" == "Status" ]; then
+	#	read_options_file "metadata_form_options_status.txt" "${file_basicfields_update}" "$ident" "$label"
+	# Topic category is no longer included because we use ckan 'groups' instead
+	#elif [ "$label" == "Topic Category" ]; then
+	#	read_options_file "metadata_form_options_topic_category.txt" "${file_basicfields_update}" "$ident" "$label"
 	elif [ "$label" == "Use Constraints" ]; then
 		read_options_file "metadata_form_options_use_constraints.txt" "${file_basicfields_update}" "$ident" "$label"
 	elif [ "$label" == "Contact Consent" ]; then

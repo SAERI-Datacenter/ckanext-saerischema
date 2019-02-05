@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 # Create a dataset from a CSV file
+# 1.10 arb Tue  5 Feb 12:34:18 GMT 2019 - many improvements and fixes
 # 1.05 arb Wed 30 Jan 10:18:31 GMT 2019 - remove apostrophes from keywords
 # 1.04 arb Tue 29 Jan 11:44:09 GMT 2019 - csv_filename can be first parameter
 # 1.03 arb Mon Jan 28 18:17:26 GMT 2019 - add dataset to group
@@ -39,43 +40,61 @@ only_add_first_entry = False
 csv_filename="metadata_FK_export190127.csv"
 group_csv_filename="../../../../ckanext-saeritheme/ckanext/saeritheme/tools/topic_categories.csv"
 user_agent = 'ckanapiexample/1.0 (+http://example.com/my/website)'
+default_contact_consent = '0'
+default_permit_id = ''
 
-# CSV fields are:
+# The metadata records are read from a CSV file which is assumed to have these columns:
 # ['region', 'organisation', 'id_text', 'unique_resource_id', 'title', 'language', 'abstract', 'topic_category', 'keywords', 'temporal_extent_start', 'temporal_extent_end', 'dataset_reference_date', 'lineage', 'w_long', 's_lat', 'e_long', 'n_lat', 'spatial_reference_system', 'responsible_organisation_name', 'contact_mail_address', 'responsible_party_role', 'frequency_update', 'limitations_access', 'use_constraints', 'data_format', 'accuracy', 'metadata_date', 'metadata_point_contact', 'resource_type', 'original_title', 'id', 'status', 'x_location', 'y_location']
 
-# CSV column mapping to CKAN field name
+# The CSV column names are mapped to CKAN schema field names:
 map_CSV_to_CKAN = {
-	'title': 'title',
+	'title':    'title',
 	'abstract': 'notes',
 	'keywords': 'tag_string',
-	'region': 'saeri_region',
+	'region':   'saeri_region',
 	'language': 'saeri_language',
-	'topic_category': 'saeri_topic_category',
-	'temporal_extent_start': 'saeri_temporal_extent_start',
-	'temporal_extent_end': 'saeri_temporal_extent_end',
+	'topic_category':  'saeri_topic_category',
+	'temporal_extent_start':  'saeri_temporal_extent_start',
+	'temporal_extent_end':    'saeri_temporal_extent_end',
 	'dataset_reference_date': 'saeri_dataset_reference_date',
 	'lineage': 'saeri_lineage',
-	'w_long': 'saeri_west_longitude',
-	's_lat': 'saeri_south_latitude',
-	'e_long': 'saeri_east_longitude',
-	'n_lat': 'saeri_north_latitude',
+	'w_long':  'saeri_west_longitude',
+	's_lat':   'saeri_south_latitude',
+	'e_long':  'saeri_east_longitude',
+	'n_lat':   'saeri_north_latitude',
 	'spatial_reference_system': 'saeri_spatial_reference_system',
 	'responsible_organisation_name': 'saeri_responsible_organisation_name',
-	'contact_mail_address': 'saeri_contact_mail_address',
+	'contact_mail_address':   'saeri_contact_mail_address',
 	'responsible_party_role': 'saeri_responsible_party_role',
-	'limitations_access': 'saeri_access_limitations',
-	'use_constraints': 'saeri_use_constraints',
-	'data_format': 'saeri_data_format',
+	'limitations_access':  'saeri_access_limitations',
+	'use_constraints':     'saeri_use_constraints',
+	'data_format':      'saeri_data_format',
 	'frequency_update': 'saeri_update_frequency',
-	'accuracy': 'saeri_accuracy',
-	'resource_type': 'saeri_resource_type',
-	'original_title': 'saeri_original_title',
-	'metadata_date': 'saeri_metadata_date',
+	'accuracy':         'saeri_accuracy',
+	'resource_type':    'saeri_resource_type',
+	'original_title':   'saeri_original_title',
+	'metadata_date':    'saeri_metadata_date',
 	'metadata_point_contact': 'saeri_metadata_point_of_contact',
-	'unique_resource_id': 'saeri_unique_resource_id',
-	'status': 'saeri_status',
+	'unique_resource_id':     'saeri_unique_resource_id',
+	'status':       'saeri_status',
 	'organisation': 'owner_org',
+	# The following are NOT in the CSV file, but might be in the future.
+	# (these names are used lower down to give a default value, so take care)
+	'contact_consent':  'saeri_contact_consent',
+	'permit_id':        'saeri_research_permit_application_id',
 }
+
+# Map from the CSV use_constraints to CKAN license_id
+map_saeri_use_constraints_to_license_id = {
+	'notcommercial' : 'other-nc',     # Not for commercial use
+	'notfornav'     : 'notspecified', # Not to be used for navigational purposes
+	'researchonly'  : 'other-nc',     # To be used for research only
+	'open'          : 'other-open',   # Open
+	'openbut'       : 'other-at',     # Open, but copyright and/or Intellectual Property Rights apply
+	'restricted'    : 'other-closed', # Restricted
+	'restrictedbut' : 'other-closed', # Restricted, but open subject to limitations and prior agreement with responsible organisation. Copyright must be cited
+}
+
 
 # -----------------------------------------------------------------------
 # Convert title to name by lowercase, remove spaces, etc
@@ -98,6 +117,25 @@ def ckan_name_from_title(title):
 	return name[:100]
 
 # -----------------------------------------------------------------------
+# Read the "metadata_form_options_*.txt" files which map the content of
+# the CSV file and what is shown in a drop-down menu into the content of
+# the database and what is used as the 'value' in the html <option> tag.
+# The files are tab separated, first column is the internal value and the
+# second is what is displayed and in the CSV.
+# eg.
+# metadata_form_options_access_limitations.txt has a line:
+# mil	Restricted because of defence and military issue
+# So the menu shows "Restricted..." but the database stored "mil"
+# When reading the CSV we need to convert from the second to the first.
+# NOTE this function is not required and can be removed!
+def read_metadata_form_options_into_dict(options_filename):
+	options_fp = open("../" + options_filename)
+	options_csv_reader = csv.reader(options_fp, delimiter='\t', quoting=csv.QUOTE_NONE)
+	for options_row in options_csv_reader:
+		print(options_row)
+	exit(0)
+
+# -----------------------------------------------------------------------
 # Read the group definition CSV file to map from
 # our topic_category column to a group (theme) name.
 # The topic_category column is in the csvname column in this CSV.
@@ -115,6 +153,46 @@ def create_mapping_topic_category_to_group():
 	return topic_category_to_group_dict
 
 # -----------------------------------------------------------------------
+# Map from the values inside the CSV file into the values stored in the database
+# The latter values are also used as the 'value' attribute of the html <options>
+# tag in the drop-down menu when editing the dataset.
+
+def convert_saeri_access_limitations(saeri_access_limitations):
+	saeri_access_limitations = saeri_access_limitations.lower()
+
+	# Possible return values are:
+	# open, mil,
+	# com-govt,     com-dept,     com-rsch,
+	# env-com-govt, env-com-dept, env-com-rsrc,
+	#               env-dept,     env-rsch
+	# However the input values don't have a one-to-one match
+	# so most of the time we have to guess:
+	if 'open access' in saeri_access_limitations:
+		return 'open'
+	if 'military' in saeri_access_limitations:
+		return 'mil'
+	if 'commerc' in saeri_access_limitations:
+		return 'com-dept'
+	if 'environ' in saeri_access_limitations:
+		return 'env-dept'
+	# The default value is:
+	return 'env-com-dept'
+
+def convert_saeri_use_constraints(saeri_use_constraints):
+	saeri_use_constraints = saeri_use_constraints.lower()
+
+	# Possible return values are:
+	# notcommercial, notfornav, researchonly, open, openbut, restricted, restrictedbut
+	# Input values are plain text so don't have a one-to-one match
+	# so most of the time we have to guess:
+	if 'open acces' in saeri_use_constraints:
+		return 'open'
+	if 'restricted' in saeri_use_constraints:
+		return 'restrictedbut'
+	# The default value is:
+	return 'openbut'
+
+# -----------------------------------------------------------------------
 # Check if an organisation exists in CKAN, returns True if it does.
 # Uses an exact match so be careful about capital/lowercase.
 # Typically we store organisation 'name' lowercase.
@@ -125,7 +203,8 @@ def ckan_check_organisation_exists(org):
 	return org in organisations_list
 
 # -----------------------------------------------------------------------
-# Display the content of a dataset, used only for debugging.
+# Display the content of a dataset.
+# Only for debugging.
 
 def ckan_get_dataset(ds):
 	packages_results = ckan.action.package_show(include_private=True, include_drafts=True, id=ds)
@@ -152,7 +231,7 @@ def ckan_check_dataset_exists(ds):
 # The dataset fields are defined in the dictionary called row
 # which has been extracted from one line in a CSV file.
 
-def ckan_add_dataset_from_csv_dict(row):
+def ckan_add_dataset_from_csv_dict(row, dataset_name_to_be_updated):
 	#print("%s" % (ckan_name_from_title(row['title'])))
 	#print("%s = %s" % (ckan_name_from_title(row['title']), row['unique_resource_id']))
 	#return
@@ -181,6 +260,10 @@ def ckan_add_dataset_from_csv_dict(row):
 	# by removing spaces and non-alpha chars.
 	dataset_dict['name'] = ckan_name_from_title(dataset_dict['title'])
 
+	# For testing: only process the named dataset
+	if dataset_name_to_be_updated and (dataset_dict['name'] != dataset_name_to_be_updated):
+		return
+
 	# Lower-case organisation name
 	dataset_dict['owner_org'] = dataset_dict['owner_org'].lower()
 
@@ -192,6 +275,35 @@ def ckan_add_dataset_from_csv_dict(row):
 	# put it into a dictionary and put that into a list (assuming only one group)
 	if row['topic_category']:
 		dataset_dict['groups'] = [ { 'name': topic_category_to_group_dict[row['topic_category']] } ]
+
+	# The CSV is missing two columns: contact_consent and permit_id
+	# If they are not present then add a default value.
+	if not 'saeri_contact_consent' in dataset_dict:
+		dataset_dict['saeri_contact_consent'] = default_contact_consent
+
+	if not 'saeri_research_permit_application_id' in dataset_dict:
+		dataset_dict['saeri_research_permit_application_id'] = default_permit_id
+
+	# Some of the columns require conversion from the plain text to the value
+	# which is stored in the database. These same database values are also used
+	# as the 'value' in the html <options> tag for drop-down menus so they are
+	# defined in the metadata_for_options_*.txt files.
+	dataset_dict['saeri_access_limitations'] = convert_saeri_access_limitations(dataset_dict['saeri_access_limitations'])
+	dataset_dict['saeri_use_constraints'] = convert_saeri_use_constraints(dataset_dict['saeri_use_constraints'])
+
+	# License and whether the dataset is "open" or not,
+	# These are additional fields in CKAN calculated from our own fields.
+	# isopen is only true if the dataset is truly fully open access
+	if dataset_dict['saeri_use_constraints'] == 'open':
+		dataset_dict['isopen'] = True
+	else:
+		dataset_dict['isopen'] = False
+	# license_id can be: notspecified, other-open, other-closed, other-at, other-nc
+	if dataset_dict['saeri_use_constraints'] in map_saeri_use_constraints_to_license_id:
+		dataset_dict['license_id'] = map_saeri_use_constraints_to_license_id[dataset_dict['saeri_use_constraints']]
+	else:
+		dataset_dict['license_id'] = 'notspecified'
+	#dataset_dict['license_title'] = '' # XXX maybe this will get added automatically?
 
 	# Spatial component is GeoJSON converted from bounding box coords
 	spatial_string = saerickan.saerickan_convert_bbox_to_geojson(
@@ -241,6 +353,9 @@ def ckan_add_dataset_from_csv_dict(row):
 # CSV filename is first parameter
 if len(sys.argv) > 1:
 	csv_filename = sys.argv[1]
+dataset_name_to_be_updated = ''
+if len(sys.argv) > 2:
+	dataset_name_to_be_updated = sys.argv[2]
 
 # Read the configuration
 ckan_ip = open("ckan_ip.txt").read().replace('\n','')
@@ -258,7 +373,7 @@ ckan = RemoteCKAN('http://%s' % ckan_ip, apikey=api_key, user_agent=user_agent)
 
 # Process each row
 for row in reader:
-	ckan_add_dataset_from_csv_dict(row)
+	ckan_add_dataset_from_csv_dict(row, dataset_name_to_be_updated)
 	# Stop after the first row?
 	if only_add_first_entry:
 		break
