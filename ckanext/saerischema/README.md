@@ -11,6 +11,8 @@ It updates the content inside `plugin.py` (adding code to create the schema fiel
 
 It handles these schema fields as special cases: `Region`, `Responsible Party Role`, `Access Limitations`, `Status`, `Topic Category`, `Use Constraints`, `Contact Consent`. They all require a drop-down menu, so the list of options to put in each menu has to be defined somewhere. The respective files are metadata_form_options...txt (eg. `metadata_form_options_region.txt`).
 
+To add additional Spatial Reference Systems please edit `saerickan.oy`
+
 ## metadata_form_blank.xlsx
 
 The definition of the metadata fields. This was used to create metadata_form_fields.txt and the metadata_form_options files. If you change this spreadsheet you should also change those files.
@@ -43,6 +45,8 @@ It uses macros which are defined in `/usr/lib/ckan/default/src/ckan/ckan/templat
 The `metadata_form_to_ckan.sh` script creates the `additional_info.html` file which is used to display the dataset contents.
 It handles two fields slightly differently: contact details and research permit application id should be hidden by default.
 Conact details are only visible if consent has been given. In both cases the values will be shown to sysadmin users.
+
+The allowed values for Spatial Reference System (SRS/CRS) are defined in the `saerickan.py` script.
 
 # To do
 
