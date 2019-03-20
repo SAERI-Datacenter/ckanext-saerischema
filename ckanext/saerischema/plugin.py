@@ -1,3 +1,4 @@
+# 1.08 arb Wed 20 Mar 17:22:28 GMT 2019 - convert_bbox_to_spatial handles datasets without srs
 # 1.07 arb Wed Jan 23 11:18:58 GMT 2019 - added two validators to handle 'restricted' field of resource metadata
 # 1.06 arb Mon Jan 21 15:50:00 GMT 2019 - added mime type for GeoJSON
 # 1.05 arb Thu Jan 17 17:23:23 GMT 2019 - added level and allowed_users for restricted plugin
@@ -63,11 +64,15 @@ def SaerischemaPlugin_validator_convert_bbox_to_spatial(key, flattened_data, err
     log.debug("SaerischemaPlugin flattened_data is %s" % (str(flattened_data)))
 
     # Lookup the entered values (warning: might not be validated/converted yet)
-    srs = flattened_data[('saeri_spatial_reference_system',)]
-    n = flattened_data[('saeri_north_latitude',)]
-    s = flattened_data[('saeri_south_latitude',)]
-    w = flattened_data[('saeri_west_longitude',)]
-    e = flattened_data[('saeri_east_longitude',)]
+    # in case we are given a dataset without our values we return empty
+    try:
+        srs = flattened_data[('saeri_spatial_reference_system',)]
+        n = flattened_data[('saeri_north_latitude',)]
+        s = flattened_data[('saeri_south_latitude',)]
+        w = flattened_data[('saeri_west_longitude',)]
+        e = flattened_data[('saeri_east_longitude',)]
+    except:
+        srs = n = s = w = e = ''
 
     # Construct GeoJSON format from bounding box
     # eg. '{ "type": "Polygon", "coordinates": [[ [ -59.26,-51.94 ], [ -57.62,-51.94 ], [ -57.62,-51.16 ], [ -59.26,-51.16 ], [ -59.26,-51.94 ] ]] }'
