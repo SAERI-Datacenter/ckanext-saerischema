@@ -1,3 +1,4 @@
+open	Open access
 env-govt	Restricted because of environmental sensitivity issue, however data is open to government departments
 env-dept	Restricted because of environmental sensitivity issue, however data is open to members of the department
 env-rsch	Restricted because of environmental sensitivity issue, however data is open to researchers on the basis of a research agreement
@@ -5,7 +6,6 @@ com-govt	Restricted because of commercial sensitivity issue, however data is ope
 com-dept	Restricted because of commercial sensitivity issue, however data is open to member of the department
 com-rsch	Restricted because of commercial sensitivity issue, however anonymysed data is open to researchers on the basis of a research agreement
 mil	Restricted because of defence and military issue
-open	Open access
 env-com-govt	Restricted because of environmental and commercial sensitivity issues, however data is open to government departments
 env-com-dept	Restricted because of environmental and commercial sensitivity issues, however data is open to members of the department
 env-com-rsrc	Restricted because of environmental and commercial sensitivity issues, however anonymised data is open to researchers on the basis of a research agreement
