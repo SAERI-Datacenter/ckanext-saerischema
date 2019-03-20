@@ -1,4 +1,6 @@
 #!/bin/bash
+# 1.06 arb Wed 20 Mar 22:45:35 GMT 2019 - additional_info now displays the description instead of the label
+# 1.05 arb Wed 20 Mar 17:21:13 GMT 2019 - topic category added back in
 # 1,04 arb Tue 29 Jan 11:44:09 GMT 2019 - change Hidden logic so sysadmin always allowed even if consent field absent
 # 1.03 arb Sat 26 Jan 23:33:44 GMT 2019 - hide more contact details:
 #      saeri_metadata_point_of_contact
@@ -52,6 +54,7 @@ touch $file_basicfields_update
 # ----------------------------------------------------------------------
 # plugin.py
 # The input file must be tab-separated Label Description
+# We add code into plugin.py which updates the ckan schema to hold our additional fields.
 
 echo "Updating plugin.py"
 comma=""
@@ -60,21 +63,53 @@ cat $file_input | while IFS="	" read label description; do
 	ident=`echo $label | sed -e 's/^/saeri_/' -e 's/ /_/g' | tr '[:upper:]' '[:lower:]'`
 	#echo "$ident = $label"
 
+	# The update function converts TO extras
 	echo "            ${comma}'${ident}': [toolkit.get_validator('ignore_missing'),"      >> ${file_plugin_update}
 	echo "                                 toolkit.get_converter('convert_to_extras')]"   >> ${file_plugin_update}
 
+	# The show function converts FROM extras
 	echo "            ${comma}'${ident}': [toolkit.get_converter('convert_from_extras')," >> ${file_plugin_show}
 	echo "                            toolkit.get_validator('ignore_missing')]"           >> ${file_plugin_show}
 
 	comma="," # subsequent lines are separated by a comma in the schema dictionary
 done
 
+# Apply the changes to plugin.py by replacing everything between the lines START and END.
+# Do it in two places, once in the update function and once in the show function.
 sed -i.bak '/SAERISCHEMA_UPDATE_START/,/SAERISCHEMA_UPDATE_END/!b;//!d;/SAERISCHEMA_UPDATE_START/r '${file_plugin_update} ${file_plugin}
 sed -i.bck '/SAERISCHEMA_SHOW_START/,/SAERISCHEMA_SHOW_END/!b;//!d;/SAERISCHEMA_SHOW_START/r       '${file_plugin_show}   ${file_plugin}
 
 # ----------------------------------------------------------------------
 # additional_info.html
 # The input file must be tab-separated Label Description
+# This file displays the additional fields from our schema.
+
+read_options_file_for_additional_info()
+{
+	options_input_file="$1"    # read optionvalue<tab>optiontext lines from this file
+	options_output_file="$2"   # append to this file
+	options_id="$3"            # The HTML form name, eg. saeri_topic_category
+	echo "Creating display options for $options_id"
+
+	firstline=1
+	cat "${options_input_file}" | while IFS="	" read label description; do
+		# What we want to end up with looks like this:
+		# {% if pkg_dict.saeri_use_constraints == "openbut" %} Open, but something...
+        # {% elif pkg_dict.saeri_use_constraints == "restricted" %} Restricted...
+        # {% else %}
+        # {{ pkg_dict.saeri_use_constraints }}
+        # {% endif %}
+        if [ $firstline -eq 1 ]; then
+            firstline=0
+            echo '      {% if pkg_dict.'${options_id}' == "'"${label}"'" %} '"${description}" >> ${options_output_file}
+        else
+            echo '      {% elif pkg_dict.'${options_id}' == "'"${label}"'" %} '"${description}" >> ${options_output_file}
+        fi
+	done
+	echo '      {% else %}'                     >> ${options_output_file}
+	echo '      {{ pkg_dict.'${options_id}' }}' >> ${options_output_file}
+	echo '      {% endif %}'                    >> ${options_output_file}
+}
 
 echo "Updating additional_info.html"
 cat $file_input | while IFS="	" read label description; do
@@ -85,19 +120,47 @@ cat $file_input | while IFS="	" read label description; do
     echo '  {% if pkg_dict.'${ident}' %}'                                         >> ${file_addinfo_update}
 	echo '    <tr>'                                                               >> ${file_addinfo_update}
 	echo '      <th scope="row" class="dataset-label">{{ _("'${label}'") }}</th>' >> ${file_addinfo_update}
+
+	# Change the value of certain fields.
 	# If the item is saeri_research_permit_application_id then it is hidden unless sysadmin
+	echo '      <td class="dataset-details">'  >> ${file_addinfo_update}
 	if [ $ident == "saeri_research_permit_application_id" ]; then
-		echo '      <td class="dataset-details">{% if c.userobj.sysadmin %}{{ pkg_dict.'${ident}' }}{% else %}<i>Hidden</i>{% endif %}</td>'       >> ${file_addinfo_update}
+		echo '      {% if c.userobj.sysadmin %}{{ pkg_dict.'${ident}' }}' >> ${file_addinfo_update}
+		echo '      {% else %}<i>Hidden (internal use only)</i>'          >> ${file_addinfo_update}
+		echo '      {% endif %}'                                          >> ${file_addinfo_update}
 	# If the item is contact details then it is hidden without consent
 	elif [ $ident == "saeri_metadata_point_of_contact" \
 		-o $ident == "saeri_responsible_organisation_name" \
 		-o $ident == "saeri_contact_mail_address" \
 		-o $ident == "saeri_responsible_party_role" ]; then
-		echo '      <td class="dataset-details">{% if c.userobj.sysadmin or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == 1 ) %}{{ pkg_dict.'${ident}' }}{% else %}<i>Hidden</i>{% endif %}</td>'       >> ${file_addinfo_update}
-	# All other fields are shown directly
+		echo '      {% if c.userobj.sysadmin or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == 1 ) %}{{ pkg_dict.'${ident}' }}'   >> ${file_addinfo_update}
+		echo '      {% else %}<i>Hidden (personal data protection)</i>'   >> ${file_addinfo_update}
+		echo '      {% endif %}</td>'       >> ${file_addinfo_update}
+	# The following all require the value to be translated from the database value to a human-readable value
+	elif [ "$label" == "Region" ]; then
+		read_options_file_for_additional_info "metadata_form_options_region.txt" "${file_addinfo_update}" "$ident"
+	# Responsible Party Role might need multiple values so don't constrain it with a drop-down menu
+	#elif [ "$label" == "Responsible Party Role" ]; then
+	#	read_options_file_for_additional_info "metadata_form_options_resp_party_role.txt" "${file_addinfo_update}"
+	elif [ "$label" == "Access Limitations" ]; then
+		read_options_file_for_additional_info "metadata_form_options_access_limitations.txt" "${file_addinfo_update}" "$ident"
+	# Status is no longer included because we don't import Incomplete records
+	#elif [ "$label" == "Status" ]; then
+	#	read_options_file_for_additional_info "metadata_form_options_status.txt" "${file_addinfo_update}"
+	# Topic category is included again even though we use ckan 'groups'
+	elif [ "$label" == "Topic Category" ]; then
+		read_options_file_for_additional_info "metadata_form_options_topic_category.txt" "${file_addinfo_update}" "$ident"
+	elif [ "$label" == "Use Constraints" ]; then
+		read_options_file_for_additional_info "metadata_form_options_use_constraints.txt" "${file_addinfo_update}" "$ident"
+	elif [ "$label" == "Contact Consent" ]; then
+		read_options_file_for_additional_info "metadata_form_options_contact_consent.txt" "${file_addinfo_update}" "$ident"
+	# All other fields are shown but some may need to be translated
+	# from the database value to a human value via the options file.
 	else
-		echo '      <td class="dataset-details">{{ pkg_dict.'${ident}' }}</td>'       >> ${file_addinfo_update}
+		echo '        {{ pkg_dict.'${ident}' }}'     >> ${file_addinfo_update}
 	fi
+	echo '      </td>'                         >> ${file_addinfo_update}
+
 	echo '    </tr>'                                                              >> ${file_addinfo_update}
 	echo '  {% endif %}'                                                          >> ${file_addinfo_update}
 
@@ -112,7 +175,7 @@ sed -i.bak '/SAERISCHEMA_ADDINFO_START/,/SAERISCHEMA_ADDINFO_END/!b;//!d;/SAERIS
 
 # This function reads tab-separated options from a file and
 # appends <option> statements to the given filename.
-read_options_file()
+read_options_file_for_package_basic_fields()
 {
 	options_input_file="$1"    # read optionvalue<tab>optiontext lines from this file
 	options_output_file="$2"   # append to this file
@@ -149,22 +212,22 @@ cat $file_input | while IFS="	" read label description; do
 	# but there is no macro for dropdown menus so we use our own function defined above.
 	# Actually there is but we haven't migrated to use it yet.
 	if [ "$label" == "Region" ]; then
-		read_options_file "metadata_form_options_region.txt" "${file_basicfields_update}" "$ident" "$label"
+		read_options_file_for_package_basic_fields "metadata_form_options_region.txt" "${file_basicfields_update}" "$ident" "$label"
 	# Responsible Party Role might need multiple values so don't constrain it with a drop-down menu
 	#elif [ "$label" == "Responsible Party Role" ]; then
-	#	read_options_file "metadata_form_options_resp_party_role.txt" "${file_basicfields_update}" "$ident" "$label"
+	#	read_options_file_for_package_basic_fields "metadata_form_options_resp_party_role.txt" "${file_basicfields_update}" "$ident" "$label"
 	elif [ "$label" == "Access Limitations" ]; then
-		read_options_file "metadata_form_options_access_limitations.txt" "${file_basicfields_update}" "$ident" "$label"
+		read_options_file_for_package_basic_fields "metadata_form_options_access_limitations.txt" "${file_basicfields_update}" "$ident" "$label"
 	# Status is no longer included because we don't import Incomplete records
 	#elif [ "$label" == "Status" ]; then
-	#	read_options_file "metadata_form_options_status.txt" "${file_basicfields_update}" "$ident" "$label"
-	# Topic category is no longer included because we use ckan 'groups' instead
-	#elif [ "$label" == "Topic Category" ]; then
-	#	read_options_file "metadata_form_options_topic_category.txt" "${file_basicfields_update}" "$ident" "$label"
+	#	read_options_file_for_package_basic_fields "metadata_form_options_status.txt" "${file_basicfields_update}" "$ident" "$label"
+	# Topic category is included again even though we use ckan 'groups'
+	elif [ "$label" == "Topic Category" ]; then
+		read_options_file_for_package_basic_fields "metadata_form_options_topic_category.txt" "${file_basicfields_update}" "$ident" "$label"
 	elif [ "$label" == "Use Constraints" ]; then
-		read_options_file "metadata_form_options_use_constraints.txt" "${file_basicfields_update}" "$ident" "$label"
+		read_options_file_for_package_basic_fields "metadata_form_options_use_constraints.txt" "${file_basicfields_update}" "$ident" "$label"
 	elif [ "$label" == "Contact Consent" ]; then
-		read_options_file "metadata_form_options_contact_consent.txt" "${file_basicfields_update}" "$ident" "$label"
+		read_options_file_for_package_basic_fields "metadata_form_options_contact_consent.txt" "${file_basicfields_update}" "$ident" "$label"
 	else
 		echo "  {{ form.input('${ident}', label=_('${label}'), id='field-${ident}', placeholder=_('${description}'), value=data.${ident}, error=errors.${ident}, classes=['control-medium']) }}" >> ${file_basicfields_update}
 	fi
