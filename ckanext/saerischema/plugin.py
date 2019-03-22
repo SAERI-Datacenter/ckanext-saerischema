@@ -1,3 +1,4 @@
+# 1.09 arb Fri 22 Mar 01:05:24 GMT 2019 - fix json quoting when converting level to restricted
 # 1.08 arb Wed 20 Mar 17:22:28 GMT 2019 - convert_bbox_to_spatial handles datasets without srs
 # 1.07 arb Wed Jan 23 11:18:58 GMT 2019 - added two validators to handle 'restricted' field of resource metadata
 # 1.06 arb Mon Jan 21 15:50:00 GMT 2019 - added mime type for GeoJSON
@@ -103,7 +104,8 @@ def SaerischemaPlugin_validator_convert_level_to_restricted(key, flattened_data,
     #log.debug("XXX restricted is %s" % rr)
     #log.debug("XXX level is %s" % lv)
     #log.debug("XXX users is %s" % au)
-    json = '{\"allowed_users\": \"%s\", \"level\": \"%s\"}' % (au, lv)
+    # WRONG json = '{\"allowed_users\": \"%s\", \"level\": \"%s\"}' % (au, lv)
+    json = '{"allowed_users": "%s", "level": "%s"}' % (au, lv)
     log.debug("SaerischemaPlugin_validator_convert_level_to_restricted setting restricted to %s" % json)
     flattened_data[('resources', 0, 'restricted')] = json
 
