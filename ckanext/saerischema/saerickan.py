@@ -101,6 +101,8 @@ def saerickan_convert_bbox_to_geojson(srs,top,bottom,left,right):
         src_proj = Proj(init='epsg:3395')
     elif srs == 'TM CM 60W': # 9 of these
         src_proj = Proj(init='epsg:6703')
+    elif srs == 'Montserrat 1958 British West Indies Grid': # Montserrat
+        src_proj = Proj(init='epsg:2004')
     else:
         log.error("saerickan_convert_bbox_to_geojson ERROR unknown SRS %s" % srs)
         return ''
