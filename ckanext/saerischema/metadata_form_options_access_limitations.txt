@@ -1,11 +1,23 @@
 open	Open access
-env-govt	Restricted because of environmental sensitivity issue, however data is open to government departments
-env-dept	Restricted because of environmental sensitivity issue, however data is open to members of the department
-env-rsch	Restricted because of environmental sensitivity issue, however data is open to researchers on the basis of a research agreement
-com-govt	Restricted because of commercial sensitivity issue, however data is open to government departments
-com-dept	Restricted because of commercial sensitivity issue, however data is open to member of the department
-com-rsch	Restricted because of commercial sensitivity issue, however anonymysed data is open to researchers on the basis of a research agreement
-mil	Restricted because of defence and military issue
-env-com-govt	Restricted because of environmental and commercial sensitivity issues, however data is open to government departments
-env-com-dept	Restricted because of environmental and commercial sensitivity issues, however data is open to members of the department
-env-com-rsrc	Restricted because of environmental and commercial sensitivity issues, however anonymised data is open to researchers on the basis of a research agreement
+env-govt	Restricted, data environmentally sensitive, however data is open to government departments
+env-dept	Restricted, data environmentally sensitive, however data is open to members of the department
+env-rsch	Restricted, data environmentally sensitive, however data is open to researchers on the basis of a research agreement
+com-govt	Restricted, data commercially sensitive, however data is open to government departments
+com-dept	Restricted, data commercially sensitive, however data is open to member of the department
+com-rsch	Restricted, data commercially sensitive, however anonymised data is open to researchers on the basis of a research agreement
+mil	Restricted, military sensitivity
+env-com-govt	Restricted, data environmentally and commercially sensitive, however data is open to government departments
+env-com-dept	Restricted, data environmentally and commercially sensitive, however data is open to members of the department
+env-com-rsrc	Restricted, data environmentally and commercially sensitive, however anonymised data is open to researchers on the basis of a research agreement
+govt	Restricted to government departments
+org	Restricted to the organisation
+pub	Restricted until publication
+comm	Restricted, data commercially sensitive
+env	Restricted, data environmentally sensitive
+soc	Restricted, data socially sensitive
+licence	Restricted, licence apply
+dat_cus	Restricted, send data request to data custodian
+dat_own	Restricted, send data request to data owner
+pnt_con	Restricted, send data request to point of contact
+dat_cus_fees	Restricted, send data request to data custodian. Fees may apply
+fees	Restricted, fees may apply.
