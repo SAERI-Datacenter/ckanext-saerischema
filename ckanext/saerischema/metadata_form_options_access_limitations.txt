@@ -20,4 +20,4 @@ dat_cus	Restricted, send data request to data custodian
 dat_own	Restricted, send data request to data owner
 pnt_con	Restricted, send data request to point of contact
 dat_cus_fees	Restricted, send data request to data custodian. Fees may apply
-fees	Restricted, fees may apply.
+fees	Restricted, fees may apply
