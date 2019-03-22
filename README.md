@@ -64,3 +64,7 @@ The set of additional fields (i.e. additional to those which CKAN already provid
 There are some HTML files in `ckanext/saerischema/templates/package/snippets` but these should *not* be edited. They have been customised to display certain fields in the correct place on the page but most of the contents are modified automatically by the script described above.
 
 See https://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html
+
+The ckanext/saerischema directory contains a README.md with more details.
+
+The ckanext/saerischema/tools directory contains some utilities and a README.md with more details.
