@@ -23,12 +23,14 @@ then add `saerischema` to the `ckan.plugins` line in your ckan config file and r
 Now the `restricted` extension needs to be installed:
 ```
 cd /usr/lib/ckan/default/src
-git clone https://github.com/EnviDat/ckanext-restricted.git
+git clone https://github.com/SAERI-Datacenter/ckanext-restricted.git
 cd ckanext-restricted
 python setup.py develop
 pip install -r dev-requirements.txt
 ```
 then add `restricted` to the `ckan.plugins` line in your ckan config file and restart the web server with `sudo service apache2 restart`
+
+If you get an Internal Server Error after restarting apache then check the error log `/var/log/apache2/ckan_default.error.log` and it might show an IOError Permission Denied trying to update a translation file, eg. `fr.js`. If so use `sudo chmod 666 filename` where the filename is the full path name shown in the error log such as `/usr/lib/ckan/default/src/ckan/ckan/public/base/i18n/fr.js`
 
 See the CKAN documentation for installing the `spatial` plugins.
 
