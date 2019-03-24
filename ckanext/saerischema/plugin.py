@@ -1,3 +1,5 @@
+# 1.11 arb Sun 24 Mar 01:51:44 GMT 2019 - inherit package create/update to force dataset into group
+# 1.10 arb Fri 22 Mar 19:16:38 GMT 2019 - convert topic_category into group
 # 1.09 arb Fri 22 Mar 01:05:24 GMT 2019 - fix json quoting when converting level to restricted
 # 1.08 arb Wed 20 Mar 17:22:28 GMT 2019 - convert_bbox_to_spatial handles datasets without srs
 # 1.07 arb Wed Jan 23 11:18:58 GMT 2019 - added two validators to handle 'restricted' field of resource metadata
@@ -16,6 +18,10 @@
 # fields required by the 'restricted' plugin allowing for resources
 # to be restricted to certain users.
 
+# XXX TODO
+# Modify show_package_schema to change values to "Hidden" if protected and not sysadmin.
+# Better to do it here rather than in the HTML template.
+
 # See the documentation:
 # http://docs.ckan.org/en/2.8/extensions/adding-custom-fields.html
 # The convert_to/from_extras code is here:
@@ -26,9 +32,15 @@
 # https://docs.ckan.org/en/2.8/maintaining/filestore.html#filestore-api
 # GeoJSON mimetype: https://tools.ietf.org/html/rfc7946
 
+# ckan plugin
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckan.plugins.toolkit import Invalid
+# to patch the package_create/update methods
+import ckan.logic
+from ckan.logic.action.create import package_create
+from ckan.logic.action.update import package_update
+# general
 import logging
 import mimetypes
 import saerickan
@@ -111,25 +123,111 @@ def SaerischemaPlugin_validator_convert_level_to_restricted(key, flattened_data,
 
 
 def SaerischemaPlugin_validator_convert_level_from_restricted(key, flattened_data, errors, context):
-    log.debug("SaerischemaPlugin_validator_convert_level_from_restricted flattened_data is %s" % (str(flattened_data)))
+    log.debug("SaerischemaPlugin_validator_convert_level_from_restricted NotYetImplemented flattened_data is %s" % (str(flattened_data)))
+    # Not yet implemented.
+    # Would we ever want to populate the level fields from the restricted field?
+    # The latter is never modified directly. Except when a script does it? XXX
 
+
+def SaerischemaPlugin_validator_convert_topic_category_to_group(key, flattened_data, errors, context):
+    return
+    # XXX the rest of this code no longer used because it is not effective
+    # the replacement is to extend the package_create and package_update methods instead, see below.
+    log.debug("SaerischemaPlugin_validator_convert_topic_category_to_group NotYetImplemented flattened_data is %s" % (str(flattened_data)))
+    # First look up the group which matches the given topic_category
+    # Find its 'id' (and 'name'?)
+    topic_category = flattened_data[('saeri_topic_category',)]
+    topic_group = saerickan.saerickan_map_topic_category_to_group(context, topic_category)
+    topic_group_id = topic_group['id']
+    log.debug("SaerischemaPlugin_validator_convert_topic_category_to_group XXX topic %s -> group id %s" % (topic_category, topic_group_id))
+    # Need to iterate through all items in the flattened_data "list"
+    # looking for tuples ('group', N, 'id')
+    # If present then do nothing
+    # If not present then add ('group', N+1, 'id') = topic_group_id
+    # or call the action package_patch to do the same
+    # XXX *** NOTE: a validator is NOT the place to be adding data!!!
+    # adding a group to flattened_data does make the dataset part of that group.
+    # The code below is pointless.
+    already_in_group = False
+    already_in_num_groups = -1
+    for data_tuple in flattened_data:
+        # tuple is ('group', N, 'key') so find the maximum N
+        if (data_tuple[0] == 'group'):
+            already_in_num_groups = max(already_in_num_groups, data_tuple[1])
+            log.error("XXX Found %d groups in flattened_data" % already_in_num_groups)
+        if (data_tuple[0] == 'group' and data_tuple[2] == 'id'):
+            already_in_group_id = flattened_data[data_tuple]
+            log.error("XXX for topic_category %s group id %s already in group id %s" % (topic_category, topic_group_id, already_in_group_id))
+            already_in_group = True
+    if already_in_group:
+        log.error("XXX already in group")
+    else:
+        already_in_num_groups += 1
+        log.error("XXX need to add to group id %s" % topic_group_id)
+        log.error("XXX will be group number %d for this dataset", already_in_num_groups)
+        for topic_group_elem in topic_group:
+            log.error("XXX add %s = %s" % (topic_group_elem, topic_group[topic_group_elem]))
+            flattened_data[('group', already_in_num_groups, topic_group_elem)] = topic_group[topic_group_elem]
+        #flattened_data[('group', already_in_num_groups, 'id')] = topic_group_id
+        #log.error("XXX flattened_data has %s" % flattened_data[('group', already_in_num_groups, 'id')] )
+    log.error("ZZZ done")
+
+# ---------------------------------------------------------------------
+# Functions to extend the behaviour of the package_create and package_update methods
+# to map from saeri_topic_category into the ckan group so when the user selects a
+# particular topic category it forces the package to become a member of that group.
+
+def SaerischemaPlugin_add_group_to_package_based_on_topic_category(context, data_dict):
+    # Lookup the topic category in the CSV file
+    if not 'saeri_topic_category' in data_dict:
+        return data_dict
+    log.error("SaerischemaPlugin_add_group_to_package_based_on_topic_category")
+    topic_category = data_dict['saeri_topic_category']
+    topic_group = saerickan.saerickan_map_topic_category_to_group(context, topic_category)
+    if topic_group is None:
+        return data_dict
+    if 'id' in topic_group:
+        topic_group_id = topic_group['id']
+    else:
+        return data_dict
+    # Add or replace the groups dict with { 'id' : the id of the matching group }
+    if 'groups' in data_dict:
+        data_dict['groups'].append({'id':topic_group_id})
+    else:
+        data_dict['groups'] = [{'id':topic_group_id}]
+    return data_dict
+
+def SaerischemaPlugin_package_create(context, data_dict):
+    data_dict = SaerischemaPlugin_add_group_to_package_based_on_topic_category(context, data_dict)
+    return package_create(context, data_dict)
+
+def SaerischemaPlugin_package_update(context, data_dict):
+    data_dict = SaerischemaPlugin_add_group_to_package_based_on_topic_category(context, data_dict)
+    return package_update(context, data_dict)
 
 # ---------------------------------------------------------------------
 # Our class contains the additional schema elements required for our metadata
 
 class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IDatasetForm)
+    plugins.implements(plugins.IActions)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IValidators) # for get_validators function
     #plugins.implements(plugins.ITemplateHelpers) # for get_helpers function
 
     log.debug("SaerischemaPlugin created")
 
+    # IActions
+    # Extend the package_create/update methods
+    def get_actions(self):
+        return {'package_create': SaerischemaPlugin_package_create,
+            'package_update': SaerischemaPlugin_package_update }
 
     # Return the list of validators which we supply (functions must be global)
     def get_validators(self):
         log.debug("SaerischemaPlugin get_validators returning 3 incl bbox and level")
         return { 'convert_bbox_to_spatial':  SaerischemaPlugin_validator_convert_bbox_to_spatial,
+            'convert_topic_category_to_group':   SaerischemaPlugin_validator_convert_topic_category_to_group,
             'convert_level_to_restricted':   SaerischemaPlugin_validator_convert_level_to_restricted,
             'convert_level_from_restricted': SaerischemaPlugin_validator_convert_level_from_restricted }
 
@@ -146,7 +244,8 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             ,'saeri_language': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_topic_category': [toolkit.get_validator('ignore_missing'),
-                                 toolkit.get_converter('convert_to_extras')]
+                                 toolkit.get_converter('convert_to_extras'),
+                                 toolkit.get_converter('convert_topic_category_to_group')]
             ,'saeri_temporal_extent_start': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_temporal_extent_end': [toolkit.get_validator('ignore_missing'),
@@ -213,7 +312,7 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         return schema
 
     # The create_package_schema() function is used whenever a new dataset
-    # is created, we'll want update the default schema and insert our
+    # is created, we want to update the default schema and insert our
     # custom field here. We will fetch the default schema defined in
     # default_create_package_schema() by running
     # create_package_schema()'s super function and update it.
@@ -355,3 +454,8 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         toolkit.add_resource('fanstatic', 'saerischema')
         mimetypes.add_type('application/geo+json', '.geojson') # As per RFC, not application/json
         log.debug("SaerischemaPlugin update_config called")
+
+
+# Test
+if __name__ == "__main__":
+    serickan.saerickan_map_topic_category_to_group('test')

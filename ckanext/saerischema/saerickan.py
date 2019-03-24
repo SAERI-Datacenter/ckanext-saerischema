@@ -1,9 +1,12 @@
 #!/usr/bin/env python
+# 1.04 arb Sat 23 Mar 01:57:23 GMT 2019 - added saerickan_map_topic_category_to_group
+# 1.03 arb                              - added Montserrat SRS
 # 1.02 arb Thu 17 Jan 09:27:57 GMT 2019 - added logging
 # 1.01 arb Fri 21 Dec 11:08:41 GMT 2018 - handle case when only bottom,left is provided
 # 1.00 arb Thu 20 Dec 13:46:04 GMT 2018
 
 # Functions for SAERI's CKAN installation
+# Requires pip install pyproj
 
 # GeoJSON is:
 # { "type": "Point", "coordinates": [-3.145,53.078] }
@@ -12,7 +15,17 @@
 # Note that the first and last are the same point.
 
 from pyproj import Proj
+import csv       # for csv.DictReader
+import sys,os
 import logging
+import ckan.plugins.toolkit as toolkit # for get_action
+
+# Configuration:
+# Define the location of the CSV file which maps topic_category to group name and description
+# This will be used in ckan_add_dataset.py, and in saerischema plugin
+# when updating a dataset to add it to the appropriate groups based on topic_category.
+#group_csv_filename="../../../../ckanext-saeritheme/ckanext/saeritheme/tools/topic_categories.csv"
+group_csv_filename="/usr/lib/ckan/default/src/ckanext-saeritheme/ckanext/saeritheme/tools/topic_categories.csv"
 
 # Doesn't work (is ignored): logging.basicConfig(filename="/tmp/ckan_debug.log", level=logging.DEBUG) # XXX arb ???
 log = logging.getLogger(__name__)
@@ -142,6 +155,51 @@ def saerickan_convert_bbox_to_geojson(srs,top,bottom,left,right):
     return ''
 
 
+# -----------------------------------------------------------------------
+# Read the group definition CSV file to map from
+# our topic_category column to a group (theme) name.
+# The topic_category column is in the csvname column in this CSV.
+# CSV is:
+# csvname,group,title,description,logo
+# Returns a dictionary.
+# XXX this code also exists inside saeritheme/ckan_add_dataset.py
+
+# We keep a 'global' copy so that we don't have to keep reading the CSV file 
+topic_category_to_group_dict = {}
+
+def saerickan_create_mapping_topic_category_to_group():
+    global topic_category_to_group_dict
+    if len(topic_category_to_group_dict) > 0:
+        return topic_category_to_group_dict
+    group_csv_fp = open(group_csv_filename)
+    group_csv_reader = csv.DictReader(group_csv_fp)
+    for group_row in group_csv_reader:
+        topic_category_to_group_dict[group_row['csvname']] = group_row['group']
+    group_csv_fp.close()
+    return topic_category_to_group_dict
+
+# ---------------------------------------------------------------------
+# Convert the topic_category string into a matching group object
+
+def saerickan_map_topic_category_to_group(context, topic_category):
+    # Read CSV from theme plugin
+    topic_category_to_group_dict = saerickan_create_mapping_topic_category_to_group()
+ 
+    # Convert topic_category to group name using CSV info
+    group_name = topic_category_to_group_dict[topic_category]
+ 
+    # Convert group name to group id using a validator, doesn't work
+    #return ckan.logic.converters.convert_group_name_or_id_to_id(group_name)
+ 
+    # Convert group name to group object by looking it up in ckan database
+    #log.error("XXX topic_category = %s" % topic_category)
+    #log.error("XXX group_name = %s" % group_name)
+    group = toolkit.get_action("group_show")(context, {'id':group_name})
+    #log.error("XXX group id = %s" % group['id'])
+    #log.error("XXX group = %s" % str(group))
+    return(group)
+
+
 # ---------------------------------------------------------------------
 # Main program for testing
 # Usage: SRS N S W E
@@ -149,5 +207,13 @@ def saerickan_convert_bbox_to_geojson(srs,top,bottom,left,right):
 
 if __name__ == "__main__":
     import sys
+    from ckanapi import RemoteCKAN
     logging.basicConfig(stream=sys.stdout, level=0)
-    print(saerickan_convert_bbox_to_geojson(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]))
+    # Read the configuration
+    ckan_ip = open("ckan_ip.txt").read().replace('\n','')
+    api_key = open("ckan_api_key.txt").read().replace('\n','')
+    # Open the connection to the CKAN server
+    ckan = RemoteCKAN('http://%s' % ckan_ip, apikey=api_key, user_agent='user_agent')
+
+    print(saerickan_map_topic_category_to_group('biota'))
+    #print(saerickan_convert_bbox_to_geojson(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]))
