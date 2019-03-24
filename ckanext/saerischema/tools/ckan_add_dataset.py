@@ -96,26 +96,6 @@ map_saeri_use_constraints_to_license_id = {
 
 
 # -----------------------------------------------------------------------
-# Convert title to name by lowercase, remove spaces, etc
-# The name will be used for the URL so it has to be sanitised.
-# Ultimately it will be unique for each dataset.
-
-def ckan_name_from_title(title):
-	# replace all spaces by a dash
-	name = re.sub(" +", "-", title.lower())
-
-	# keep only alpha-num and dashes
-	name = re.sub("[^a-z0-9-]", "", name)
-
-	# remove spaces from start and end, and squash multiple spaces
-	name = re.sub("^-", "", name)
-	name = re.sub("-$", "", name)
-	name = re.sub("-+", "-", name)
-
-	# return a maximum length of 100
-	return name[:100]
-
-# -----------------------------------------------------------------------
 # Read the "metadata_form_options_*.txt" files which map the content of
 # the CSV file and what is shown in a drop-down menu into the content of
 # the database and what is used as the 'value' in the html <option> tag.
@@ -251,7 +231,7 @@ def ckan_add_dataset_from_csv_dict(row, dataset_name_to_be_updated):
 
 	# Create the name (which forms the URL) from the title
 	# by removing spaces and non-alpha chars.
-	dataset_dict['name'] = ckan_name_from_title(dataset_dict['title'])
+	dataset_dict['name'] = saerickan.saerickan_name_from_title(dataset_dict['title'])
 
 	# For testing: only process the named dataset
 	if dataset_name_to_be_updated and (dataset_dict['name'] != dataset_name_to_be_updated):

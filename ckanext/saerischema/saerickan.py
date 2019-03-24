@@ -16,6 +16,7 @@
 
 from pyproj import Proj
 import csv       # for csv.DictReader
+import re        # for re.sub
 import sys,os
 import logging
 import ckan.plugins.toolkit as toolkit # for get_action
@@ -198,6 +199,27 @@ def saerickan_map_topic_category_to_group(context, topic_category):
     #log.error("XXX group id = %s" % group['id'])
     #log.error("XXX group = %s" % str(group))
     return(group)
+
+
+# -----------------------------------------------------------------------
+# Convert title to name by lowercase, remove spaces, etc
+# The name will be used for the URL so it has to be sanitised.
+# Ultimately it will be unique for each dataset.
+
+def saerickan_name_from_title(title):
+    # replace all spaces by a dash
+    name = re.sub(" +", "-", title.lower())
+
+    # keep only alpha-num and dashes
+    name = re.sub("[^a-z0-9-]", "", name)
+
+    # remove spaces from start and end, and squash multiple spaces
+    name = re.sub("^-", "", name)
+    name = re.sub("-$", "", name)
+    name = re.sub("-+", "-", name)
+
+    # return a maximum length of 100
+    return name[:100]
 
 
 # ---------------------------------------------------------------------
