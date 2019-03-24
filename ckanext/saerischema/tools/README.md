@@ -71,7 +71,9 @@ You also need to specify the file type. This is important and should be specifie
 You can also optionally specify if the resource is to be restricted. (See the documentation of the restricted plugin for details.)
 https://github.com/SAERI-Datacenter/ckanext-restricted
 
-Run `./ckan_add_resource_to_dataset.py -d dataset-name -f file_name -t type_of_file [-r restriction [-u allowed_users]]`
+Run `./ckan_add_resource_to_dataset.py -d dataset-name -f file_name -t type_of_file [-s srs] [-r restriction [-u allowed_users]]`
+
+The -s option, if given, takes the name of a SRS to be used if the shapefile has no SRS. The default is `epsg:2004` (which is suitable for Montserrat).
 
 The -r option, if given, takes one of the values: public, registered, any_organization, same_organization, only_allowed_users.
 

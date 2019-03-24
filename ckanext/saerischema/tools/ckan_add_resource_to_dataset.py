@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# 1.01 arb Sun 24 Mar 14:29:41 GMT 2019 - add -s option,
+#      calculate an appropriate simplify distance from the extent
 # 1.00 arb Fri 22 Mar 00:31:40 GMT 2019 - first version
 # Upload a resource to a dataset.
 # NOTE: requires that the 'jq' package has been installed into the OS.
@@ -41,6 +43,7 @@ import saerickan
 # The default is to simplify Shapefiles into GeoJSON previews using 500m steps
 shp_default_srs = 'epsg:2004'
 shp_simplify_meters = 500
+shp_simplify_factor = 0.01
 
 # The default value for all resources is public
 restricted_to = 'public'
@@ -54,8 +57,8 @@ dataset_name = file_name = file_type = restricted_key = allowed_users = ''
 preview_file_name = ''
 dummy_url = 'dummy-value-for-ckan-pre-2.6'
 user_agent = 'ckanapiexample/1.0 (+http://example.com/my/website)'
-usage = '-d dataset_name -f filename_to_upload -t type_of_file [-r restriction [-u allowed_users]]\n-r is public, registered, any_organization, same_organization, only_allowed_users\n-u is a comma-separated list of usernames\n'
-options = 'd:f:t:r:u:'
+usage = '-d dataset_name -f filename_to_upload -t type_of_file [-s srs] [-r restriction [-u allowed_users]]\n-s is the default SRS used for shapefiles if they do not have one, eg. epsg:2004\n-r is public, registered, any_organization, same_organization, only_allowed_users\n-u is a comma-separated list of usernames\n'
+options = 'd:f:t:s:r:u:'
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], options)
@@ -69,6 +72,8 @@ for opt,arg in opts:
 		file_name = arg
 	if opt == '-t':
 		file_type = arg
+	if opt == '-s':
+		shp_default_srs = arg
 	if opt == '-r':
 		restricted_to = arg
 		if restricted_to not in restricted_to_allowable_values:
@@ -119,6 +124,17 @@ if re.match(".*\\.[Zz][Ii][Pp]$", file_name):
 				ogr_cmd_srs = ''
 			else:
 				ogr_cmd_srs = '-s_srs ' + shp_default_srs
+			# Set the 'simplify' option from the extent
+			# Get the maximum amount of difference in X or Y range
+			x_min, x_max, y_min, y_max = ogr_data.GetLayer().GetExtent()
+			x_delta = (x_max - x_min)
+			y_delta = (y_max - y_min)
+			max_delta = max(x_delta, y_delta)
+			# See if the extents are in degrees or meters
+			# then take 1% of the extent
+			if max(x_min, x_max, y_min, y_max) < 361:
+				max_delta *= 110000
+			shp_simplify_meters = int(max_delta * shp_simplify_factor)
 			# Create a GDAL command line to convert to GeoJSON and simplify the vectors
 			gdal_cmd = "ogr2ogr -f geojson -simplify %s %s -t_srs WGS84  /vsistdout/  /vsizip/%s | jq 'del(.crs)' > %s" % (shp_simplify_meters, ogr_cmd_srs, file_name, preview_file_name)
 
