@@ -38,7 +38,6 @@ import saerickan
 ignore_incomplete_datasets = True
 only_add_first_entry = False
 csv_filename="metadata_FK_export190127.csv"
-group_csv_filename="../../../../ckanext-saeritheme/ckanext/saeritheme/tools/topic_categories.csv"
 user_agent = 'ckanapiexample/1.0 (+http://example.com/my/website)'
 default_contact_consent = '0'
 default_permit_id = ''
@@ -136,21 +135,15 @@ def read_metadata_form_options_into_dict(options_filename):
 	exit(0)
 
 # -----------------------------------------------------------------------
+# This function has been moved into saerickan.py
 # Read the group definition CSV file to map from
 # our topic_category column to a group (theme) name.
 # The topic_category column is in the csvname column in this CSV.
 # CSV is:
 # csvname,group,title,description,logo
 # Returns a dictionary.
+# def create_mapping_topic_category_to_group():
 
-def create_mapping_topic_category_to_group():
-	group_csv_fp = open(group_csv_filename)
-	group_csv_reader = csv.DictReader(group_csv_fp)
-	topic_category_to_group_dict = {}
-	for group_row in group_csv_reader:
-		topic_category_to_group_dict[group_row['csvname']] = group_row['group']
-	group_csv_fp.close()
-	return topic_category_to_group_dict
 
 # -----------------------------------------------------------------------
 # Map from the values inside the CSV file into the values stored in the database
@@ -362,7 +355,7 @@ ckan_ip = open("ckan_ip.txt").read().replace('\n','')
 api_key = open("ckan_api_key.txt").read().replace('\n','')
 
 # Read CSV from theme plugin
-topic_category_to_group_dict = create_mapping_topic_category_to_group()
+topic_category_to_group_dict = saerickan.saerickan_create_mapping_topic_category_to_group()
 
 # Read in the CSV file
 fp = open(csv_filename)
