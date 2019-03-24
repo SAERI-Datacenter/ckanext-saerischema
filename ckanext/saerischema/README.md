@@ -13,6 +13,10 @@ It handles these schema fields as special cases: `Region`, `Responsible Party Ro
 
 To add additional Spatial Reference Systems please edit `saerickan.oy`
 
+The plugin MUST have access to the list of topic categories so that it can map to CKAN groups.
+The `saerickan.py` script is hard-coded to use `/usr/lib/ckan/default/src/ckanext-saeritheme/ckanext/saeritheme/tools/topic_categories.csv`
+This is the default location as used in the theme plugin but the administrator must NOTE this dependency.
+
 ## metadata_form_blank.xlsx
 
 The definition of the metadata fields. This was used to create metadata_form_fields.txt and the metadata_form_options files. If you change this spreadsheet you should also change those files.
@@ -47,6 +51,8 @@ It handles two fields slightly differently: contact details and research permit 
 Conact details are only visible if consent has been given. In both cases the values will be shown to sysadmin users.
 
 The allowed values for Spatial Reference System (SRS/CRS) are defined in the `saerickan.py` script.
+
+The mapping from topic_category to ckan group is done by intercepting calls to package_create and package_update. It reads the `topic_categories.csv` file as described above.
 
 # To do
 

@@ -4,9 +4,25 @@ This is a CKAN plugin to implement additional metadata fields (schema) specifica
 
 It displays the fields for entering metadata on the dataset create/update page and displays the (non-empty) fields on the dataset display page. Some of the SAERI fields re-use existing CKAN metadata fields (eg. Description which is renamed to Abstract, Tags which is renamed to Keywords, Topic Category becomes a CKAN group which is displayed as Theme) and the rest are additional.
 
-One unique feature is the bounding box which the user enters into the four fields (east, west, north, south) is converted into a GeoJSON format and stored in the CKAN spatial field which allows the user to search for datasets by specifying an area on a map. The Spatial Reference System is used to determine whether the coordinates are lat,long degrees or metres in a UTM projection. At the moment only certain SRS are supported: "WGS84", "UTM 21S WGS84" (becomes epsg:32721), "UTM 28S WGS84" (becomes epsg:32728), "World Mercator WGS84 Datum" (becomes epsg:3395), "TM CM 60W" (becomes epsg:6703).
+One unique feature is that the bounding box which the user enters into the four fields (east, west, north, south) is converted into a GeoJSON format and stored in the CKAN extra 'spatial' field which allows the user to search for datasets by specifying an area on a map.
+The Spatial Reference System is used to determine whether the coordinates are lat,long degrees or metres in a UTM projection.
+At the moment only certain SRS are supported:
+* "WGS84", "UTM 21S WGS84" (becomes epsg:32721)
+* "UTM 28S WGS84" (becomes epsg:32728)
+* "World Mercator WGS84 Datum" (becomes epsg:3395)
+* "TM CM 60W" (becomes epsg:6703)
+* "Montserrat 1958 British West Indies Grid" (becomes epsg:2004).
 
-It has the ability to restrict download access for the resources of a dataset to members of an organisation or specific named users. Note that the list of users must be comma-separated without any spaces.  This feature has a dependency on the 'restricted plugin (see below for installation).
+There is a mapping between the metadata field called 'topic_category' and the CKAN concept of Groups.
+Groups are used to group together all datasets which share a common theme, eg. Biota, and so is synonymous with topic category.
+(However, normally, ckan datasets can be a member of multiple groups but SAERI topic category is only a single selection).
+The schema plugin uses the SAERI extra metadata field 'topic_category' to force the dataset to be a member of the corresponding ckan group automatically. The groups must already exist! (see Installation and tools directory).
+If the user manually adds a dataset to multiple other groups this will be allowed but if the dataset metadata is subsequently updated then the group membership will be reset to the topic_category group only.
+
+The schema plugin has the ability to restrict download access for the resources of a dataset to members of an organisation or specific named users.
+Note that the list of users must be comma-separated without any spaces.
+This feature has a dependency on the 'restricted' plugin (see below for installation).
+
 
 ## Installation
 
