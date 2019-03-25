@@ -5,6 +5,7 @@
 # Then determine if the files are restricted in any way.
 # Then upload using the script  ckan_add_resource_to_dataset.py
 
+from __future__ import print_function
 import urllib2
 import urllib
 import json
@@ -21,17 +22,29 @@ import saerickan
 # Configuration
 csv_filename = 'new_montserrat_metadata_form_filled_V4IM.csv'
 upload_prog = './ckan_add_resource_to_dataset.py'
+column_name_containing_resource_path = 'original_title _dataportal'
+default_allowed_users='saeri,ilaria,arb'
+default_restriction_method = 'only_allowed_users'
 repo_dir = '.'
 tmp_dir = "/tmp"
 file_srs = ''
 file_restriction = ''
 file_allowed_users = ''
-only_add_first_entry = True
+only_add_first_entry = False
+debug = True
+
+# When zipping a shapefile include all associated files with these extensions
 shape_file_extension_list = [
 	'shp', 'shx', 'dbf', 'sbn', 'sbx', 'atx',
 	'fbn', 'fbx', 'ain', 'aih', 'ixs', 'mxs', 'prj', 'xml', 'cpg']
-default_allowed_users='saeri,ilaria,arb'
-default_restriction_method = 'only_allowed_users'
+
+# Map file extension (WITH dot) to CKAN type
+# Only list the ones which aren't simply the same as the file extension
+file_ext_to_type_map = {
+	'tif'  : 'GeoTIFF',
+	'tiff' : 'GeoTIFF',
+	'jpg'  : 'JPEG',
+}
 
 # Parse command-line parameters
 usage = '-c metadata.csv -r repo_dir [-s srs]\n' \
@@ -59,45 +72,46 @@ reader = csv.DictReader(fp)
 
 # Process each row
 for row in reader:
-	if not row['original_title _dataportal']:
+	if not row[column_name_containing_resource_path]:
 		continue
-	print(row)
+	#print(row)
 
 	# Determine the file(s) to be uploaded
-	file_name = repo_dir + row['original_title _dataportal']
+	# NOTE: file_name is full path, file_basename is full path without ext, file_ext has dot removed
+	file_name = repo_dir + row[column_name_containing_resource_path]
 	(file_basename, file_ext) = os.path.splitext(file_name)
-	file_type = file_ext.upper()
-	if file_type == 'JPG':
-		file_type = 'JPEG'
+	file_ext = file_ext.replace('.', '') # remove the dot
+
+	# Map a range of other file extensions to CKAN file types
+	# File type as given to CKAN shall be uppercase unless it's a word
+	if file_ext.lower() in file_ext_to_type_map:
+		file_type = file_ext_to_type_map[file_ext.lower()]
+	else:
+		file_type = file_ext.upper()
 
 	if not os.path.isfile(file_name):
-		print("File not found for %s -  %s" % (row['title'], file_name))
 		file_name = os.path.basename(file_name)
 		if not os.path.isfile(file_name):
 			# not even found in current directory
+			#########################print("File not found for %s -  %s" % (row['title'], file_name))
 			continue
 
 	# See if Shapefiles need to be zipped
 	zip_file_name = ''
-	if re.match(".*\\.[Ss][Hh][Pp]$", file_name): # ie. *.shp
+	if file_ext.lower() == 'shp':
 		# Remove .shp and look for all other related files
-		(file_basename, file_ext) = os.path.splitext(file_name)
 		files_to_zip = []
 		for ext in shape_file_extension_list:
 			if os.path.isfile(file_basename + '.' + ext):
 				files_to_zip.append(file_basename + '.' + ext)
-		#print(files_to_zip)
 		# A temporary zip file is created from the shapefile basename
 		zip_file_name = tmp_dir + '/' + os.path.basename(file_basename) + '.zip'
+		if debug: print("Zipping %s from %s" % (zip_file_name, files_to_zip))
 		zip = zipfile.ZipFile(zip_file_name, mode = 'w', compression = zipfile.ZIP_DEFLATED, allowZip64 = True)
 		for fn in files_to_zip:
 			zip.write(fn, os.path.basename(fn))
-		#print(zip_file_name)
 		file_name = zip_file_name
 		file_type = 'Shapefile'
-
-	if re.match(".*\\.[Tt][Ii][Ff]+$", file_name): # ie. *.tif or *.tiff
-		file_type = 'GeoTIFF'
 
 	# We need to collect the following information:
 	# filename, dataset name, type, srs, restriction
@@ -116,17 +130,21 @@ for row in reader:
 	else:
 		print("Warning: no limitations_access column in CSV file")
 
-	cmd = "%s -d '%s' -f '%s'" % (upload_prog, dataset_name, file_name)
+	cmd = "%s -d '%s' -f '%s' -t '%s'" % (upload_prog, dataset_name, file_name, file_type)
 	if file_srs:
 		cmd += " -s '%s'" % file_srs
 	if file_restriction:
 		cmd += " -r '%s'" % file_restriction
 	if file_allowed_users:
-		cmd += " -a '%s'" % file_allowed_users
-	print(cmd)
+		cmd += " -u '%s'" % file_allowed_users
+	if debug: print("Running %s" % cmd)
+	rc = os.system(cmd)
+	if rc > 0:
+		print("ERROR %d uploading '%s' to '%s' with command %s" % (rc, file_name, dataset_name, cmd), file=sys.stderr)
+		exit(1)
 
 	if zip_file_name:
-		print("remove zip %s" % zip_file_name)
+		#print("remove zip %s" % zip_file_name)
 		os.unlink(zip_file_name)
 
 	# Stop after the first row?
