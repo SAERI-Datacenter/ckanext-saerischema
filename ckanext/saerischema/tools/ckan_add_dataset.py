@@ -20,6 +20,7 @@
 # 6. Convert the 'spatial' field like the plugin would do
 # 7. Call package_create
 
+from __future__ import print_function
 import urllib2
 import urllib
 import json
