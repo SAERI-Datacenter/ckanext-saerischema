@@ -105,7 +105,7 @@ for row in reader:
 			if os.path.isfile(file_basename + '.' + ext):
 				files_to_zip.append(file_basename + '.' + ext)
 		# A temporary zip file is created from the shapefile basename
-		zip_file_name = tmp_dir + '/' + os.path.basename(file_basename) + '.zip'
+		zip_file_name = os.path.join(tmp_dir, os.path.basename(file_basename) + '.zip')
 		if debug: print("Zipping %s from %s" % (zip_file_name, files_to_zip))
 		zip = zipfile.ZipFile(zip_file_name, mode = 'w', compression = zipfile.ZIP_DEFLATED, allowZip64 = True)
 		for fn in files_to_zip:
