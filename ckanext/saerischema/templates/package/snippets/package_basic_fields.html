@@ -79,17 +79,29 @@
   <label for="field-saeri_access_limitations" class="control-label">Access Limitations</label>
   <div class="controls">
     <select id="field-saeri_access_limitations" name="saeri_access_limitations" data-module="autocomplete">
-      <option value="env-govt" {{ "selected " if "env-govt" == data['saeri_access_limitations'] }} >Restricted because of environmental sensitivity issue, however data is open to government departments</option>
-      <option value="env-dept" {{ "selected " if "env-dept" == data['saeri_access_limitations'] }} >Restricted because of environmental sensitivity issue, however data is open to members of the department</option>
-      <option value="env-rsch" {{ "selected " if "env-rsch" == data['saeri_access_limitations'] }} >Restricted because of environmental sensitivity issue, however data is open to researchers on the basis of a research agreement</option>
-      <option value="com-govt" {{ "selected " if "com-govt" == data['saeri_access_limitations'] }} >Restricted because of commercial sensitivity issue, however data is open to government departments</option>
-      <option value="com-dept" {{ "selected " if "com-dept" == data['saeri_access_limitations'] }} >Restricted because of commercial sensitivity issue, however data is open to member of the department</option>
-      <option value="com-rsch" {{ "selected " if "com-rsch" == data['saeri_access_limitations'] }} >Restricted because of commercial sensitivity issue, however anonymysed data is open to researchers on the basis of a research agreement</option>
-      <option value="mil" {{ "selected " if "mil" == data['saeri_access_limitations'] }} >Restricted because of defence and military issue</option>
       <option value="open" {{ "selected " if "open" == data['saeri_access_limitations'] }} >Open access</option>
-      <option value="env-com-govt" {{ "selected " if "env-com-govt" == data['saeri_access_limitations'] }} >Restricted because of environmental and commercial sensitivity issues, however data is open to government departments</option>
-      <option value="env-com-dept" {{ "selected " if "env-com-dept" == data['saeri_access_limitations'] }} >Restricted because of environmental and commercial sensitivity issues, however data is open to members of the department</option>
-      <option value="env-com-rsrc" {{ "selected " if "env-com-rsrc" == data['saeri_access_limitations'] }} >Restricted because of environmental and commercial sensitivity issues, however anonymised data is open to researchers on the basis of a research agreement</option>
+      <option value="env-govt" {{ "selected " if "env-govt" == data['saeri_access_limitations'] }} >Restricted, data environmentally sensitive, however data is open to government departments</option>
+      <option value="env-dept" {{ "selected " if "env-dept" == data['saeri_access_limitations'] }} >Restricted, data environmentally sensitive, however data is open to members of the department</option>
+      <option value="env-rsch" {{ "selected " if "env-rsch" == data['saeri_access_limitations'] }} >Restricted, data environmentally sensitive, however data is open to researchers on the basis of a research agreement</option>
+      <option value="com-govt" {{ "selected " if "com-govt" == data['saeri_access_limitations'] }} >Restricted, data commercially sensitive, however data is open to government departments</option>
+      <option value="com-dept" {{ "selected " if "com-dept" == data['saeri_access_limitations'] }} >Restricted, data commercially sensitive, however data is open to member of the department</option>
+      <option value="com-rsch" {{ "selected " if "com-rsch" == data['saeri_access_limitations'] }} >Restricted, data commercially sensitive, however anonymised data is open to researchers on the basis of a research agreement</option>
+      <option value="mil" {{ "selected " if "mil" == data['saeri_access_limitations'] }} >Restricted, military sensitivity</option>
+      <option value="env-com-govt" {{ "selected " if "env-com-govt" == data['saeri_access_limitations'] }} >Restricted, data environmentally and commercially sensitive, however data is open to government departments</option>
+      <option value="env-com-dept" {{ "selected " if "env-com-dept" == data['saeri_access_limitations'] }} >Restricted, data environmentally and commercially sensitive, however data is open to members of the department</option>
+      <option value="env-com-rsrc" {{ "selected " if "env-com-rsrc" == data['saeri_access_limitations'] }} >Restricted, data environmentally and commercially sensitive, however anonymised data is open to researchers on the basis of a research agreement</option>
+      <option value="govt" {{ "selected " if "govt" == data['saeri_access_limitations'] }} >Restricted to government departments</option>
+      <option value="org" {{ "selected " if "org" == data['saeri_access_limitations'] }} >Restricted to the organisation</option>
+      <option value="pub" {{ "selected " if "pub" == data['saeri_access_limitations'] }} >Restricted until publication</option>
+      <option value="comm" {{ "selected " if "comm" == data['saeri_access_limitations'] }} >Restricted, data commercially sensitive</option>
+      <option value="env" {{ "selected " if "env" == data['saeri_access_limitations'] }} >Restricted, data environmentally sensitive</option>
+      <option value="soc" {{ "selected " if "soc" == data['saeri_access_limitations'] }} >Restricted, data socially sensitive</option>
+      <option value="licence" {{ "selected " if "licence" == data['saeri_access_limitations'] }} >Restricted, licence apply</option>
+      <option value="dat_cus" {{ "selected " if "dat_cus" == data['saeri_access_limitations'] }} >Restricted, send data request to data custodian</option>
+      <option value="dat_own" {{ "selected " if "dat_own" == data['saeri_access_limitations'] }} >Restricted, send data request to data owner</option>
+      <option value="pnt_con" {{ "selected " if "pnt_con" == data['saeri_access_limitations'] }} >Restricted, send data request to point of contact</option>
+      <option value="dat_cus_fees" {{ "selected " if "dat_cus_fees" == data['saeri_access_limitations'] }} >Restricted, send data request to data custodian. Fees may apply</option>
+      <option value="fees" {{ "selected " if "fees" == data['saeri_access_limitations'] }} >Restricted, fees may apply</option>
     </select>
   </div>
 </div>
@@ -97,10 +109,10 @@
   <label for="field-saeri_use_constraints" class="control-label">Use Constraints</label>
   <div class="controls">
     <select id="field-saeri_use_constraints" name="saeri_use_constraints" data-module="autocomplete">
+      <option value="open" {{ "selected " if "open" == data['saeri_use_constraints'] }} >Open</option>
       <option value="notcommercial" {{ "selected " if "notcommercial" == data['saeri_use_constraints'] }} >Not for commercial use</option>
       <option value="notfornav" {{ "selected " if "notfornav" == data['saeri_use_constraints'] }} >Not to be used for navigational purposes</option>
       <option value="researchonly" {{ "selected " if "researchonly" == data['saeri_use_constraints'] }} >To be used for research only</option>
-      <option value="open" {{ "selected " if "open" == data['saeri_use_constraints'] }} >Open</option>
       <option value="openbut" {{ "selected " if "openbut" == data['saeri_use_constraints'] }} >Open, but copyright and/or Intellectual Property Rights apply</option>
       <option value="restricted" {{ "selected " if "restricted" == data['saeri_use_constraints'] }} >Restricted</option>
       <option value="restrictedbut" {{ "selected " if "restrictedbut" == data['saeri_use_constraints'] }} >Restricted, but open subject to limitations and prior agreement with responsible organisation. Copyright must be cited</option>
@@ -118,8 +130,8 @@
   <label for="field-saeri_contact_consent" class="control-label">Contact Consent</label>
   <div class="controls">
     <select id="field-saeri_contact_consent" name="saeri_contact_consent" data-module="autocomplete">
-      <option value="1" {{ "selected " if "1" == data['saeri_contact_consent'] }} >Contact details published</option>
       <option value="0" {{ "selected " if "0" == data['saeri_contact_consent'] }} >Contact details hidden</option>
+      <option value="1" {{ "selected " if "1" == data['saeri_contact_consent'] }} >Contact details published</option>
     </select>
   </div>
 </div>

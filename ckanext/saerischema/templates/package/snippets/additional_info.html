@@ -165,17 +165,29 @@
     <tr>
       <th scope="row" class="dataset-label">{{ _("Access Limitations") }}</th>
       <td class="dataset-details">
-      {% if pkg_dict.saeri_access_limitations == "env-govt" %} Restricted because of environmental sensitivity issue, however data is open to government departments
-      {% elif pkg_dict.saeri_access_limitations == "env-dept" %} Restricted because of environmental sensitivity issue, however data is open to members of the department
-      {% elif pkg_dict.saeri_access_limitations == "env-rsch" %} Restricted because of environmental sensitivity issue, however data is open to researchers on the basis of a research agreement
-      {% elif pkg_dict.saeri_access_limitations == "com-govt" %} Restricted because of commercial sensitivity issue, however data is open to government departments
-      {% elif pkg_dict.saeri_access_limitations == "com-dept" %} Restricted because of commercial sensitivity issue, however data is open to member of the department
-      {% elif pkg_dict.saeri_access_limitations == "com-rsch" %} Restricted because of commercial sensitivity issue, however anonymysed data is open to researchers on the basis of a research agreement
-      {% elif pkg_dict.saeri_access_limitations == "mil" %} Restricted because of defence and military issue
-      {% elif pkg_dict.saeri_access_limitations == "open" %} Open access
-      {% elif pkg_dict.saeri_access_limitations == "env-com-govt" %} Restricted because of environmental and commercial sensitivity issues, however data is open to government departments
-      {% elif pkg_dict.saeri_access_limitations == "env-com-dept" %} Restricted because of environmental and commercial sensitivity issues, however data is open to members of the department
-      {% elif pkg_dict.saeri_access_limitations == "env-com-rsrc" %} Restricted because of environmental and commercial sensitivity issues, however anonymised data is open to researchers on the basis of a research agreement
+      {% if pkg_dict.saeri_access_limitations == "open" %} Open access
+      {% elif pkg_dict.saeri_access_limitations == "env-govt" %} Restricted, data environmentally sensitive, however data is open to government departments
+      {% elif pkg_dict.saeri_access_limitations == "env-dept" %} Restricted, data environmentally sensitive, however data is open to members of the department
+      {% elif pkg_dict.saeri_access_limitations == "env-rsch" %} Restricted, data environmentally sensitive, however data is open to researchers on the basis of a research agreement
+      {% elif pkg_dict.saeri_access_limitations == "com-govt" %} Restricted, data commercially sensitive, however data is open to government departments
+      {% elif pkg_dict.saeri_access_limitations == "com-dept" %} Restricted, data commercially sensitive, however data is open to member of the department
+      {% elif pkg_dict.saeri_access_limitations == "com-rsch" %} Restricted, data commercially sensitive, however anonymised data is open to researchers on the basis of a research agreement
+      {% elif pkg_dict.saeri_access_limitations == "mil" %} Restricted, military sensitivity
+      {% elif pkg_dict.saeri_access_limitations == "env-com-govt" %} Restricted, data environmentally and commercially sensitive, however data is open to government departments
+      {% elif pkg_dict.saeri_access_limitations == "env-com-dept" %} Restricted, data environmentally and commercially sensitive, however data is open to members of the department
+      {% elif pkg_dict.saeri_access_limitations == "env-com-rsrc" %} Restricted, data environmentally and commercially sensitive, however anonymised data is open to researchers on the basis of a research agreement
+      {% elif pkg_dict.saeri_access_limitations == "govt" %} Restricted to government departments
+      {% elif pkg_dict.saeri_access_limitations == "org" %} Restricted to the organisation
+      {% elif pkg_dict.saeri_access_limitations == "pub" %} Restricted until publication
+      {% elif pkg_dict.saeri_access_limitations == "comm" %} Restricted, data commercially sensitive
+      {% elif pkg_dict.saeri_access_limitations == "env" %} Restricted, data environmentally sensitive
+      {% elif pkg_dict.saeri_access_limitations == "soc" %} Restricted, data socially sensitive
+      {% elif pkg_dict.saeri_access_limitations == "licence" %} Restricted, licence apply
+      {% elif pkg_dict.saeri_access_limitations == "dat_cus" %} Restricted, send data request to data custodian
+      {% elif pkg_dict.saeri_access_limitations == "dat_own" %} Restricted, send data request to data owner
+      {% elif pkg_dict.saeri_access_limitations == "pnt_con" %} Restricted, send data request to point of contact
+      {% elif pkg_dict.saeri_access_limitations == "dat_cus_fees" %} Restricted, send data request to data custodian. Fees may apply
+      {% elif pkg_dict.saeri_access_limitations == "fees" %} Restricted, fees may apply
       {% else %}
       {{ pkg_dict.saeri_access_limitations }}
       {% endif %}
@@ -186,10 +198,10 @@
     <tr>
       <th scope="row" class="dataset-label">{{ _("Use Constraints") }}</th>
       <td class="dataset-details">
-      {% if pkg_dict.saeri_use_constraints == "notcommercial" %} Not for commercial use
+      {% if pkg_dict.saeri_use_constraints == "open" %} Open
+      {% elif pkg_dict.saeri_use_constraints == "notcommercial" %} Not for commercial use
       {% elif pkg_dict.saeri_use_constraints == "notfornav" %} Not to be used for navigational purposes
       {% elif pkg_dict.saeri_use_constraints == "researchonly" %} To be used for research only
-      {% elif pkg_dict.saeri_use_constraints == "open" %} Open
       {% elif pkg_dict.saeri_use_constraints == "openbut" %} Open, but copyright and/or Intellectual Property Rights apply
       {% elif pkg_dict.saeri_use_constraints == "restricted" %} Restricted
       {% elif pkg_dict.saeri_use_constraints == "restrictedbut" %} Restricted, but open subject to limitations and prior agreement with responsible organisation. Copyright must be cited
@@ -261,8 +273,8 @@
     <tr>
       <th scope="row" class="dataset-label">{{ _("Contact Consent") }}</th>
       <td class="dataset-details">
-      {% if pkg_dict.saeri_contact_consent == "1" %} Contact details published
-      {% elif pkg_dict.saeri_contact_consent == "0" %} Contact details hidden
+      {% if pkg_dict.saeri_contact_consent == "0" %} Contact details hidden
+      {% elif pkg_dict.saeri_contact_consent == "1" %} Contact details published
       {% else %}
       {{ pkg_dict.saeri_contact_consent }}
       {% endif %}

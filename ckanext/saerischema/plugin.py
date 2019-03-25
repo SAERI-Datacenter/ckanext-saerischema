@@ -244,8 +244,7 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             ,'saeri_language': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_topic_category': [toolkit.get_validator('ignore_missing'),
-                                 toolkit.get_converter('convert_to_extras'),
-                                 toolkit.get_converter('convert_topic_category_to_group')]
+                                 toolkit.get_converter('convert_to_extras')]
             ,'saeri_temporal_extent_start': [toolkit.get_validator('ignore_missing'),
                                  toolkit.get_converter('convert_to_extras')]
             ,'saeri_temporal_extent_end': [toolkit.get_validator('ignore_missing'),
