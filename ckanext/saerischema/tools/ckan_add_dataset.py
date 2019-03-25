@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 # Create a dataset from a CSV file
+# 1.11 arb Mon 25 Mar 18:31:53 GMT 2019 - fix access limitations mapping
 # 1.10 arb Tue  5 Feb 12:34:18 GMT 2019 - many improvements and fixes
 # 1.05 arb Wed 30 Jan 10:18:31 GMT 2019 - remove apostrophes from keywords
 # 1.04 arb Tue 29 Jan 11:44:09 GMT 2019 - csv_filename can be first parameter
@@ -38,10 +39,12 @@ import saerickan
 # ckan_api_key.txt = "0317c21c-7d04-48df-8f1b-9989edbd6165"
 ignore_incomplete_datasets = True
 only_add_first_entry = False
-csv_filename="metadata_FK_export190127.csv"
+csv_filename = "montserrat_metadata20190322.csv"
+access_limitations_file = "../metadata_form_options_access_limitations.txt"
 user_agent = 'ckanapiexample/1.0 (+http://example.com/my/website)'
 default_contact_consent = '0'
 default_permit_id = ''
+dry_run = False
 
 # The metadata records are read from a CSV file which is assumed to have these columns:
 # ['region', 'organisation', 'id_text', 'unique_resource_id', 'title', 'language', 'abstract', 'topic_category', 'keywords', 'temporal_extent_start', 'temporal_extent_end', 'dataset_reference_date', 'lineage', 'w_long', 's_lat', 'e_long', 'n_lat', 'spatial_reference_system', 'responsible_organisation_name', 'contact_mail_address', 'responsible_party_role', 'frequency_update', 'limitations_access', 'use_constraints', 'data_format', 'accuracy', 'metadata_date', 'metadata_point_contact', 'resource_type', 'original_title', 'id', 'status', 'x_location', 'y_location']
@@ -131,16 +134,27 @@ def read_metadata_form_options_into_dict(options_filename):
 # The latter values are also used as the 'value' attribute of the html <options>
 # tag in the drop-down menu when editing the dataset.
 
-def convert_saeri_access_limitations(saeri_access_limitations):
-	saeri_access_limitations = saeri_access_limitations.lower()
+map_csv_to_access_limitation = {}
 
-	# Possible return values are:
-	# open, mil,
-	# com-govt,     com-dept,     com-rsch,
-	# env-com-govt, env-com-dept, env-com-rsrc,
-	#               env-dept,     env-rsch
-	# However the input values don't have a one-to-one match
-	# so most of the time we have to guess:
+def convert_saeri_access_limitations(saeri_access_limitations):
+	global map_csv_to_access_limitation
+
+	saeri_access_limitations = saeri_access_limitations.lower().strip()
+
+	# Read TSV file first time round
+	if len(map_csv_to_access_limitation) == 0:
+		fp = open(access_limitations_file, 'r')
+		for line in fp:
+			(key, desc) = line.lower().strip().split('\t')
+			map_csv_to_access_limitation[desc] = key
+		fp.close()
+
+	if saeri_access_limitations in map_csv_to_access_limitation:
+		return map_csv_to_access_limitation[saeri_access_limitations]
+	else:
+		print("WARNING: access limitation unknown: %s" % saeri_access_limitations)
+
+	# If the input values don't have a one-to-one match we have to guess:
 	if 'open access' in saeri_access_limitations:
 		return 'open'
 	if 'military' in saeri_access_limitations:
@@ -151,6 +165,10 @@ def convert_saeri_access_limitations(saeri_access_limitations):
 		return 'env-dept'
 	# The default value is:
 	return 'env-com-dept'
+
+
+# -----------------------------------------------------------------------
+# Map use constraints from CSV, mostly free-form text so no accurate mapping.
 
 def convert_saeri_use_constraints(saeri_use_constraints):
 	saeri_use_constraints = saeri_use_constraints.lower()
@@ -303,7 +321,8 @@ def ckan_add_dataset_from_csv_dict(row, dataset_name_to_be_updated):
 	# Create or update the dataset using package_create/package_update
 	#print("Creating: %s" % dataset_dict['name'])
 	#pprint.pprint(dataset_dict)
-	result = ckan.call_action(package_create_or_update_action, dataset_dict)
+	if not dry_run:
+		result = ckan.call_action(package_create_or_update_action, dataset_dict)
 	if 'name' in result:
 		print("OK: %s for %s" % (package_create_or_update_action, dataset_dict['name']))
 	else:
