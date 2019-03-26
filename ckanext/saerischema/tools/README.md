@@ -83,5 +83,53 @@ The program has an additional feature, to create preview images for those file t
 A GeoTIFF file is converted into a reduced-resolution JPEG and both are uploaded. The maximum dimension will be 1000 pixels.
 A ShapeFile is converted into a reduced-resolution GeoJSON file and both are uploaded. The minimum distance between points will be 500m.
 (Both of these parameters can be configured within the script.)
-The preview images will be uploaded with the same file name as the original but _preview inserted.
+The preview images will be uploaded with the same file name as the original but with \_preview inserted.
 GeoJSON files can then be previewed via the GeoJSON tab (the MapViewer tab does not handle all GeoJSON formats).
+
+## ckan_add_all_resources.py
+
+Run this program to upload all resources files to all datasets.
+
+Run `./ckan_add_all_resources.py usage
+* -c metadata.csv
+* -r [repo_dir] default is /mnt/datastore
+* [-s srs]
+* -c is the metadata CSV file
+* -r is the root directory of the data repository, default is /mnt/datastore
+* -s is the SRS if the shapefile has none, eg. epsg:2004, default is epsg:2004`
+
+It reads the metadata CSV file and for each row it gets the dataset name from the `title` column and the filename from the `original_title _dataportal` column.
+The dataset name is converted to ckan format, i.e. without spaces, lowercase, less than 100 characters, and is looked up in the ckan database to find the dataset id.
+The file will be uploaded as a resource to that dataset.
+The filename is appended to the repository directory, default `/mnt/datastore` but can be changed with -r.
+If the filename is a Shapefile, i.e. ends in .shp, then this program will find all the associated files that go with it and zip them up into a temporary archive and upload that.
+This program then calls the `ckan_add_resource_to_dataset.py` program to do the work of uploading the resource (and creating and uploading a suitable preview image if necessary).
+
+## ckan_deduplicate_resources.py
+
+Run this program to reduce the size of the CKAN VM by exchanging uploaded resource files (eg. large GeoTIFF images) with a symbolic link (a pointer) to the actual resource kept in the Data Repository VM.
+It could be run from cron to perform the task automatically, see below.
+
+Run `./ckan_deduplicate_resources.py
+* [-r repo_dir] is the root directory of the repository, default /mnt/datastore
+* [-f] must be given to actually force the deduplication otherwise only info is printed`
+
+## ckan_create_auto_preview.py
+
+Run this program to automatically create preview images for geospatial datasets such as GeoTIFF and Shapefile.
+To have it run automatically it should be run from cron.
+It searches all the datasets in CKAN, finds out which resource files they have, filters out those which can have a preview created, ignores those which already have a preview, and then it calls the `ckan_create_preview_from_resource.py` script to create and upload the preview.
+
+## ckan_create_preview_from_resource.py
+
+Run this program to create a preview image for a resource which already exists in CKAN.
+Instead of extracting and downloading the source image from the CKAN web server it finds the local file on disk in order to run faster.
+
+## Note on running programs from cron
+
+Programs to be run from cron must be run inside the ckan virtual environment.
+Use a wrapper script such as `cron_wrapper.sh` like this:
+
+`/usr/lib/ckan/default/src/ckanext-saerischema/ckanext/saerischema/tools/cron_wrapper.sh /usr/lib/ckan/default/src/ckanext-saerischema/ckanext/saerischema/tools/ckan_deduplicate_resources.py`
+
+NOTE: Some scripts may require access to config files such as ckan_ip.txt, XXX this needs to be fixed.

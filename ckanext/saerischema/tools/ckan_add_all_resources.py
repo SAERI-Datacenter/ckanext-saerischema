@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # 1.00 arb Sun 24 Mar 22:02:15 GMT 2019
+
 # Read a CSV file of metadata, look in the column 'original_title _dataportal'
 # and find the files referenced within. If Shapefile then create a zip archive.
 # Then determine if the files are restricted in any way.

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# 1.00 arb Tue 26 Mar 19:29:34 GMT 2019
 
 # This program is intended to deduplicate the resources directory
 # so that large files are replaced with symbolic links to the real file
