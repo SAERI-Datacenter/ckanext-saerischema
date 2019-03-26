@@ -29,7 +29,7 @@ import saerickan
 
 # Configuration
 resource_dir="/var/lib/ckan/default/resources" # see ckan.storage_path in production.ini
-repo_dir = '.'
+repo_dir = '/mnt/datastore'
 user_agent = 'ckanapiexample/1.0 (+http://example.com/my/website)'
 debug = False
 force = False
