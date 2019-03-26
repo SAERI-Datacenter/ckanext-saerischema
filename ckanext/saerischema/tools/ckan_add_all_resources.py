@@ -78,7 +78,7 @@ for row in reader:
 
 	# Determine the file(s) to be uploaded
 	# NOTE: file_name is full path, file_basename is full path without ext, file_ext has dot removed
-	file_name = repo_dir + row[column_name_containing_resource_path]
+	file_name = os.path.join(repo_dir, row[column_name_containing_resource_path])
 	(file_basename, file_ext) = os.path.splitext(file_name)
 	file_ext = file_ext.replace('.', '') # remove the dot
 
@@ -93,7 +93,7 @@ for row in reader:
 		file_name = os.path.basename(file_name)
 		if not os.path.isfile(file_name):
 			# not even found in current directory
-			#########################print("File not found for %s -  %s" % (row['title'], file_name))
+			print("File not found %s - for dataset %s" % (file_name, row['title']))
 			continue
 
 	# See if Shapefiles need to be zipped
