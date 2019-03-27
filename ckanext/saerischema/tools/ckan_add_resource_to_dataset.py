@@ -189,7 +189,7 @@ if 'resources' in package_result:
 
 # -----------------------------------------------------------------------
 # Create preview images if required
-gdal_cmd = ''
+preview_file_name = preview_file_type = gdal_cmd = ''
 
 # Check for a shapefile inside a zip archive
 file_basename = os.path.basename(file_name)
@@ -232,12 +232,13 @@ if 'success' in result and not result['success']:
 
 # -----------------------------------------------------------------------
 # Upload the preview image too
-print("Uploading the preview")
-resource_name = os.path.basename(preview_file_name)
-resource_desc = preview_file_type
-result = ckan.action.resource_create(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=preview_file_type, restricted=restricted_key, upload=open(preview_file_name, 'rb'))
-if 'success' in result and not result['success']:
-	raise Exception("error uploading preview resource for %s - %s" % (file_name, str(result)))
+if preview_file_name:
+	print("Uploading the preview")
+	resource_name = os.path.basename(preview_file_name)
+	resource_desc = preview_file_type
+	result = ckan.action.resource_create(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=preview_file_type, restricted=restricted_key, upload=open(preview_file_name, 'rb'))
+	if 'success' in result and not result['success']:
+		raise Exception("error uploading preview resource for %s - %s" % (file_name, str(result)))
 
 
 # -----------------------------------------------------------------------
