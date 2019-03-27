@@ -21,10 +21,10 @@ sys.path.insert(1, os.path.realpath(os.path.pardir))
 import saerickan
 
 # Configuration
-csv_filename = 'new_montserrat_metadata_form_filled_V4IM.csv'
+csv_filename = 'montserrat_metadata20190325c.csv'
 upload_prog = './ckan_add_resource_to_dataset.py'
-column_name_containing_resource_path = 'original_title _dataportal'
-default_allowed_users='saeri,ilaria,arb'
+column_name_containing_resource_path = 'original_title'
+default_allowed_users='admin,saeri,ilaria,arb'
 default_restriction_method = 'only_allowed_users'
 repo_dir = '/mnt/datastore'
 tmp_dir = "/tmp"
@@ -75,11 +75,15 @@ reader = csv.DictReader(fp)
 for row in reader:
 	if not row[column_name_containing_resource_path]:
 		continue
-	#print(row)
+	print("\n\nUPLOAD to %s", row['title'])
 
 	# Determine the file(s) to be uploaded
 	# NOTE: file_name is full path, file_basename is full path without ext, file_ext has dot removed
-	file_name = os.path.join(repo_dir, row[column_name_containing_resource_path])
+	# However path in csv might be absolute so remove the first / if so.
+	path_in_csv = row[column_name_containing_resource_path]
+	if path_in_csv[0] == '/':
+		path_in_csv = path_in_csv[1:]
+	file_name = os.path.join(repo_dir, path_in_csv)
 	(file_basename, file_ext) = os.path.splitext(file_name)
 	file_ext = file_ext.replace('.', '') # remove the dot
 
@@ -91,6 +95,7 @@ for row in reader:
 		file_type = file_ext.upper()
 
 	if not os.path.isfile(file_name):
+		print("File not found %s - for dataset %s" % (file_name, row['title']))
 		file_name = os.path.basename(file_name)
 		if not os.path.isfile(file_name):
 			# not even found in current directory
@@ -111,6 +116,7 @@ for row in reader:
 		zip = zipfile.ZipFile(zip_file_name, mode = 'w', compression = zipfile.ZIP_DEFLATED, allowZip64 = True)
 		for fn in files_to_zip:
 			zip.write(fn, os.path.basename(fn))
+		zip.close()
 		file_name = zip_file_name
 		file_type = 'Shapefile'
 
