@@ -154,8 +154,8 @@ if restricted_to != '':
 
 # -----------------------------------------------------------------------
 # Read the CKAN connection configuration
-ckan_ip = open("ckan_ip.txt").read().replace('\n','')
-api_key = open("ckan_api_key.txt").read().replace('\n','')
+ckan_ip = open("/usr/lib/ckan/default/src/ckanext-saerischema/ckanext/saerischema/tools/ckan_ip.txt").read().replace('\n','')
+api_key = open("/usr/lib/ckan/default/src/ckanext-saerischema/ckanext/saerischema/tools/ckan_api_key.txt").read().replace('\n','')
 
 # Open the connection to the CKAN server
 ckan = RemoteCKAN('http://%s' % ckan_ip, apikey=api_key, user_agent=user_agent)

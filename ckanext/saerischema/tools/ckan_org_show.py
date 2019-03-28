@@ -10,8 +10,8 @@ user_agent = 'ckanapiexample/1.0 (+http://example.com/my/website)'
 org = 'bhabitat'
 
 # Read the configuration
-ckan_ip = open("ckan_ip.txt").read().replace('\n','')
-api_key = open("ckan_api_key.txt").read().replace('\n','')
+ckan_ip = open("/usr/lib/ckan/default/src/ckanext-saerischema/ckanext/saerischema/tools/ckan_ip.txt").read().replace('\n','')
+api_key = open("/usr/lib/ckan/default/src/ckanext-saerischema/ckanext/saerischema/tools/ckan_api_key.txt").read().replace('\n','')
 
 if len(sys.argv) > 1:
     dataset = sys.argv[1]

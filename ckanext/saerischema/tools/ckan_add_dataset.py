@@ -351,8 +351,8 @@ if len(sys.argv) > 2:
 	dataset_name_to_be_updated = sys.argv[2]
 
 # Read the configuration
-ckan_ip = open("ckan_ip.txt").read().replace('\n','')
-api_key = open("ckan_api_key.txt").read().replace('\n','')
+ckan_ip = open("/usr/lib/ckan/default/src/ckanext-saerischema/ckanext/saerischema/tools/ckan_ip.txt").read().replace('\n','')
+api_key = open("/usr/lib/ckan/default/src/ckanext-saerischema/ckanext/saerischema/tools/ckan_api_key.txt").read().replace('\n','')
 
 # Read CSV from theme plugin
 topic_category_to_group_dict = saerickan.saerickan_create_mapping_topic_category_to_group()
