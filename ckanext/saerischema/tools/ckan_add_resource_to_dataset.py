@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# 1.03 arb Thu 28 Mar 11:05:00 GMT 2019 - allow resources to be updated
 # 1.02 arb Mon 25 Mar 02:15:04 GMT 2019 - handle a range of vector and raster images.
 #      Added error checks and exceptions.
 # 1.01 arb Sun 24 Mar 14:29:41 GMT 2019 - add -s option,
@@ -47,13 +48,13 @@ import saerickan
 shp_default_srs = 'epsg:2004' # Montserrat
 shp_simplify_meters = 500     # do not edit this
 shp_simplify_factor = 0.01    # you can change this
-resource_already_exists_action = 'ignore'  # ignore, update or error
+resource_already_exists_action = 'update'  # ignore, update or error
 raster_file_extensions = [ '.tiff', '.tif', '.img' ]
-vector_file_extensions = [ '.gpkg' ]
+vector_file_extensions = [ '.gpkg', 'pgeo', 'cad', 'dwg', 'dxf' ]
 # The default value for all resources is public
 restricted_to = 'public'
 restricted_to_allowable_values = ('public', 'registered', 'any_organization', 'same_organization', 'only_allowed_users')
-tmp_dir = "/tmp/" # must have trailing slash
+tmp_dir = "/var/lib/ckan/tmp/" # must have trailing slash
 
 # -----------------------------------------------------------------------
 def get_gdal_command_for_vector(file_name, file_ext):
@@ -76,16 +77,20 @@ def get_gdal_command_for_vector(file_name, file_ext):
 	# Set the 'simplify' option from the extent
 	# Get the maximum amount of difference in X or Y range
 	x_min, x_max, y_min, y_max = ogr_data.GetLayer().GetExtent()
-	x_delta = (x_max - x_min)
-	y_delta = (y_max - y_min)
-	max_delta = max(x_delta, y_delta)
-	# See if the extents are in degrees or meters
-	# then take 1% of the extent
-	if max(x_min, x_max, y_min, y_max) < 361:
-		max_delta *= 110000
-	shp_simplify_meters = int(max_delta * shp_simplify_factor)
+	if x_min == float('inf'):
+		ogr_cmd_simplify = ''
+	else:
+		x_delta = (x_max - x_min)
+		y_delta = (y_max - y_min)
+		max_delta = max(x_delta, y_delta)
+		# See if the extents are in degrees or meters
+		# then take 1% of the extent
+		if max(x_min, x_max, y_min, y_max) < 361:
+			max_delta *= 110000
+		shp_simplify_meters = int(max_delta * shp_simplify_factor)
+		ogr_cmd_simplify = '-simplify %s' % shp_simplify_meters
 	# Create a GDAL command line to convert to GeoJSON and simplify the vectors
-	gdal_cmd = "ogr2ogr -f geojson -simplify %s %s -t_srs WGS84  /vsistdout/  /vsizip/%s | jq 'del(.crs)' > %s" % (shp_simplify_meters, ogr_cmd_srs, file_name, preview_file_name)
+	gdal_cmd = "ogr2ogr -f geojson %s %s -t_srs WGS84  /vsistdout/  /vsizip/%s | jq 'del(.crs)' > %s" % (ogr_cmd_simplify, ogr_cmd_srs, file_name, preview_file_name)
 	return (preview_file_name, preview_file_type, gdal_cmd)
 
 
@@ -174,6 +179,7 @@ except:
 
 # -----------------------------------------------------------------------
 # Check if the resource does not already exist in the package
+resource_create_or_update = 'create'
 resource_name = os.path.basename(file_name)
 if 'resources' in package_result:
 	for resource_result in package_result['resources']:
@@ -182,8 +188,7 @@ if 'resources' in package_result:
 				print("dataset %s already contains resource so ignoring %s" % (dataset_name, resource_name), file=sys.stderr)
 				exit(0)
 			elif resource_already_exists_action == 'update':
-				print("not yet implemented - cannot update a resource which already exists", file=sys.stderr)
-				exit(1)
+				resource_create_or_update = 'update'
 			else:
 				raise Exception("dataset %s already contains resource %s" % (dataset_name, resource_name))
 
@@ -225,7 +230,10 @@ if gdal_cmd and not os.path.isfile(preview_file_name):
 print("Uploading the resource")
 resource_name = os.path.basename(file_name)
 resource_desc = file_type
-result = ckan.action.resource_create(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=file_type, restricted=restricted_key, upload=open(file_name, 'rb'))
+if resource_create_or_update == 'create':
+	result = ckan.action.resource_create(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=file_type, restricted=restricted_key, upload=open(file_name, 'rb'))
+else:
+	result = ckan.action.resource_update(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=file_type, restricted=restricted_key, upload=open(file_name, 'rb'))
 if 'success' in result and not result['success']:
 	raise Exception("error uploading resource for %s - %s" % (file_name, str(result)))
 
@@ -236,7 +244,10 @@ if preview_file_name:
 	print("Uploading the preview")
 	resource_name = os.path.basename(preview_file_name)
 	resource_desc = preview_file_type
-	result = ckan.action.resource_create(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=preview_file_type, restricted=restricted_key, upload=open(preview_file_name, 'rb'))
+	if resource_create_or_update == 'create':
+		result = ckan.action.resource_create(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=preview_file_type, restricted=restricted_key, upload=open(preview_file_name, 'rb'))
+	else:
+		result = ckan.action.resource_update(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=preview_file_type, restricted=restricted_key, upload=open(preview_file_name, 'rb'))
 	if 'success' in result and not result['success']:
 		raise Exception("error uploading preview resource for %s - %s" % (file_name, str(result)))
 
