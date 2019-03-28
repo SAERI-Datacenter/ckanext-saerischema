@@ -30,7 +30,8 @@ import saerickan
 
 # Configuration
 resource_dir="/var/lib/ckan/default/resources" # see ckan.storage_path in production.ini
-repo_dir = '/mnt/datastore'
+#repo_dir = '/mnt/datastore'
+repo_dir = '/mnt/datastore/montserrat/repository'
 user_agent = 'ckanapiexample/1.0 (+http://example.com/my/website)'
 debug = False
 force = False
@@ -72,15 +73,17 @@ def deduplicate(name, file):
 				os.system(cmd)
 			else:
 				print(cmd)
+		else:
+			if debug: print("  different filesize!")
 
 
 # -----------------------------------------------------------------------
 # MAIN
 
-usage = "usage: [-r repo_dir] [-f]\n" \
+usage = "usage: [-d] [-r repo_dir] [-f]\n" \
 	"-r is the root directory of the repository\n" \
 	"-f must be given to actually force the deduplication otherwise only info is printed\n"
-options = "d:f:r:"
+options = "df:r:"
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], options)
@@ -110,7 +113,7 @@ if package_results['count'] < 1:
 for package in package_results['results']:
 	for resource in package['resources']:
 		if re.match(".*_preview.*", resource['name']):
-			if debug: print("Ignore preview %s" % resource['name'])
+			if debug: print("(Ignore preview %s)" % resource['name'])
 		else:
 			if debug: print("Dataset %s has resource %s in %s" % (package['name'], resource['name'], resource['id']))
 			dir1 = resource['id'][0:3]
@@ -118,14 +121,16 @@ for package in package_results['results']:
 			filename = resource['id'][6:]
 			pathname = os.path.join(resource_dir, dir1, dir2, filename)
 			if os.path.isfile(pathname):
-				if debug: print(" file %s" % pathname)
+				if debug: print("  file %s" % pathname)
 				deduplicate(resource['name'], pathname)
 			else:
 				# resource without a name is not valid so just ignore it
 				# otherwise valid resource without file is an error
 				if (resource['name']):
 					print("Error: resource %s in dataset %s has no file %s" % (resource['name'], package['name'], pathname))
-				#pprint.pprint(resource)
+				else:
+					print("resource has no name??")
+					pprint.pprint(resource)
 
 
 # -----------------------------------------------------------------------
