@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# 1.06 arb Mon  1 Apr 23:10:51 BST 2019 - fix if resource already exists.
 # 1.05 arb Mon  1 Apr 22:42:10 BST 2019 - pass id to resource_update not name.
 # 1.04 arb Mon  1 Apr 22:21:57 BST 2019 - can override SRS in all shapefiles
 # 1.03 arb Thu 28 Mar 11:05:00 GMT 2019 - allow resources to be updated
@@ -203,6 +204,7 @@ resource_name = os.path.basename(file_name)
 if 'resources' in package_result:
 	for resource_result in package_result['resources']:
 		if resource_result['name'] == resource_name:
+			resource_id = resource_result['id']
 			if resource_already_exists_action == 'ignore':
 				print("dataset %s already contains resource so ignoring %s" % (dataset_name, resource_name), file=sys.stderr)
 				exit(0)
@@ -244,6 +246,22 @@ if gdal_cmd and not os.path.isfile(preview_file_name):
 
 
 # -----------------------------------------------------------------------
+# Check if the preview resource does not already exist in the package
+resource_preview_create_or_update = 'create'
+resource_preview_name = os.path.basename(file_name)
+if 'resources' in package_result:
+	for resource_result in package_result['resources']:
+		if resource_result['name'] == resource_preview_name:
+			resource_preview_id = resource_result['id']
+			if resource_already_exists_action == 'ignore':
+				print("dataset %s already contains resource so ignoring %s" % (dataset_name, resource_preview_name), file=sys.stderr)
+				exit(0)
+			elif resource_already_exists_action == 'update':
+				resource_preview_create_or_update = 'update'
+			else:
+				raise Exception("dataset %s already contains resource %s" % (dataset_name, resource_preview_name))
+
+# -----------------------------------------------------------------------
 # Create the resource
 # See http://docs.ckan.org/en/latest/api/index.html#ckan.logic.action.create.resource_create
 print("Uploading the resource")
@@ -252,7 +270,7 @@ resource_desc = file_type
 if resource_create_or_update == 'create':
 	result = ckan.action.resource_create(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=file_type, restricted=restricted_key, upload=open(file_name, 'rb'))
 else:
-	result = ckan.action.resource_update(package_id=dataset_id,   name=resource_name, description=resource_desc, url=dummy_url, format=file_type, restricted=restricted_key, upload=open(file_name, 'rb'))
+	result = ckan.action.resource_update(id=resource_id, name=resource_name, description=resource_desc, url=dummy_url, format=file_type, restricted=restricted_key, upload=open(file_name, 'rb'))
 if 'success' in result and not result['success']:
 	raise Exception("error uploading resource for %s - %s" % (file_name, str(result)))
 
@@ -263,10 +281,10 @@ if preview_file_name:
 	print("Uploading the preview")
 	resource_name = os.path.basename(preview_file_name)
 	resource_desc = preview_file_type
-	if resource_create_or_update == 'create':
+	if resource_preview_create_or_update == 'create':
 		result = ckan.action.resource_create(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=preview_file_type, restricted=restricted_key, upload=open(preview_file_name, 'rb'))
 	else:
-		result = ckan.action.resource_update(package_id=dataset_id,   name=resource_name, description=resource_desc, url=dummy_url, format=preview_file_type, restricted=restricted_key, upload=open(preview_file_name, 'rb'))
+		result = ckan.action.resource_patch(id=resource_preview_id, name=resource_name, description=resource_desc, url=dummy_url, format=preview_file_type, restricted=restricted_key, upload=open(preview_file_name, 'rb'))
 	if 'success' in result and not result['success']:
 		raise Exception("error uploading preview resource for %s - %s" % (file_name, str(result)))
 
