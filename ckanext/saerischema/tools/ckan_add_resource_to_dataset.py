@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# 1.05 arb Mon  1 Apr 22:42:10 BST 2019 - pass id to resource_update not name.
 # 1.04 arb Mon  1 Apr 22:21:57 BST 2019 - can override SRS in all shapefiles
 # 1.03 arb Thu 28 Mar 11:05:00 GMT 2019 - allow resources to be updated
 # 1.02 arb Mon 25 Mar 02:15:04 GMT 2019 - handle a range of vector and raster images.
@@ -56,7 +57,9 @@ shp_override_srs = 'epsg:2004' # The SRS to use Use '' to accept the SRS inside 
 # The default is to simplify Shapefiles into GeoJSON previews using 500m steps
 shp_simplify_meters = 500     # do not edit this
 shp_simplify_factor = 0.01    # you can change this
+# Decide how you want to handle adding a resource which already exists:
 resource_already_exists_action = 'update'  # ignore, update or error
+# Define the file extensions which can be converted to a preview
 raster_file_extensions = [ '.tiff', '.tif', '.img' ]
 vector_file_extensions = [ '.gpkg', 'pgeo', 'cad', 'dwg', 'dxf' ]
 # The default value for all resources is public
@@ -185,6 +188,7 @@ ckan = RemoteCKAN('http://%s' % ckan_ip, apikey=api_key, user_agent=user_agent)
 # Check that the dataset exists
 try:
 	package_result = ckan.action.package_show( id=dataset_name )
+	dataset_id = package_result['id']
 except:
 	print("Dataset %s not found so cannot add resource to it %s" % (dataset_name, file_name), file=sys.stderr)
 	exit(1)
@@ -248,7 +252,7 @@ resource_desc = file_type
 if resource_create_or_update == 'create':
 	result = ckan.action.resource_create(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=file_type, restricted=restricted_key, upload=open(file_name, 'rb'))
 else:
-	result = ckan.action.resource_update(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=file_type, restricted=restricted_key, upload=open(file_name, 'rb'))
+	result = ckan.action.resource_update(package_id=dataset_id,   name=resource_name, description=resource_desc, url=dummy_url, format=file_type, restricted=restricted_key, upload=open(file_name, 'rb'))
 if 'success' in result and not result['success']:
 	raise Exception("error uploading resource for %s - %s" % (file_name, str(result)))
 
@@ -262,7 +266,7 @@ if preview_file_name:
 	if resource_create_or_update == 'create':
 		result = ckan.action.resource_create(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=preview_file_type, restricted=restricted_key, upload=open(preview_file_name, 'rb'))
 	else:
-		result = ckan.action.resource_update(package_id=dataset_name, name=resource_name, description=resource_desc, url=dummy_url, format=preview_file_type, restricted=restricted_key, upload=open(preview_file_name, 'rb'))
+		result = ckan.action.resource_update(package_id=dataset_id,   name=resource_name, description=resource_desc, url=dummy_url, format=preview_file_type, restricted=restricted_key, upload=open(preview_file_name, 'rb'))
 	if 'success' in result and not result['success']:
 		raise Exception("error uploading preview resource for %s - %s" % (file_name, str(result)))
 
