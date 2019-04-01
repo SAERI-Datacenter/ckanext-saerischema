@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# 1.04 arb Mon  1 Apr 22:21:57 BST 2019 - can override SRS in all shapefiles
 # 1.03 arb Thu 28 Mar 11:05:00 GMT 2019 - allow resources to be updated
 # 1.02 arb Mon 25 Mar 02:15:04 GMT 2019 - handle a range of vector and raster images.
 #      Added error checks and exceptions.
@@ -36,6 +37,7 @@ import getopt    # for command line arguments
 import zipfile   # for handling zipped shapefiles
 from osgeo import gdal # to get dimensions of geotiff (if this errors, remove /usr/lib/ckan/default/lib/python2.7/no-global-site-packages.txt)
 from osgeo import ogr  # to get SRS of a shapefile
+from osgeo import osr  # to get SRS
 from ckanapi import RemoteCKAN
 # import our tools from the parent directory
 import sys,os
@@ -43,9 +45,15 @@ sys.path.insert(1, os.path.realpath(os.path.pardir))
 import saerickan
 
 # Configuration
+# If the Shapefile has a SRS:
+#   use shp_override_srs to replace the SRS in the file with a different one
+#   or use '' to accept the SRS inside the Shapefile.
+# If the Shapefile doesn't have a SRS:
+#   use shp_default_srs to say which SRS should be assumed.
 # The default SRS if a Shapefile has None is Montserrat
+shp_default_srs  = 'epsg:2004' # The SRS to use if the Shapefile has no SRS. Montserrat is 'epsg:2004'
+shp_override_srs = 'epsg:2004' # The SRS to use Use '' to accept the SRS inside the file, or 'epsg:2004' to override 
 # The default is to simplify Shapefiles into GeoJSON previews using 500m steps
-shp_default_srs = 'epsg:2004' # Montserrat
 shp_simplify_meters = 500     # do not edit this
 shp_simplify_factor = 0.01    # you can change this
 resource_already_exists_action = 'update'  # ignore, update or error
@@ -71,7 +79,14 @@ def get_gdal_command_for_vector(file_name, file_ext):
 		ogr_data = ogr.Open(file_name, 0)
 	# Determine the source SRS, if undefined assume epsg:2004 (Montserrat)
 	if ogr_data.GetLayer().GetSpatialRef():
+		wgs84 = osr.SpatialReference()
+		wgs84.ImportFromEPSG(4326)
 		ogr_cmd_srs = ''
+		# If an override has been specified then use it for all Shapefiles
+		# XXX Should only override those with Montserrat 1958 but haven't implemented the test yet
+		# so override all those which are not WGS84.
+		if shp_override_srs and not wgs84.IsSame(ogr_data.GetLayer().GetSpatialRef()) :
+			ogr_cmd_srs = '-s_srs ' + shp_override_srs
 	else:
 		ogr_cmd_srs = '-s_srs ' + shp_default_srs
 	# Set the 'simplify' option from the extent
