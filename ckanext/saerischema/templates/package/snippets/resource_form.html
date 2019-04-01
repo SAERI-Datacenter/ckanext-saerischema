@@ -10,17 +10,21 @@
 {# Add the two additional ones required by ckanext_restricted #}
 
 {# SAERISCHEMA_RESFORM_START #}
-{{ form.select('level', id='field-level', label=_('Access Constraint'),
-options=[ {'name':'public', 'value':'public', 'text':'Public'},
-{'name':'registered', 'value':'registered', 'text':'Registered Users'},
-{'name':'any_organization', 'value':'any_organization', 'text':'Any Organization Members (Trusted Users)'},
-{'name':'same_organization', 'value':'same_organization', 'text':'Same Organization Members'},
-{'name':'only_allowed_users', 'value':'only_allowed_users', 'text':'Allowed Users Only'} ],
-selected=data['level'],
-classes=['control-medium']) }}
+<div class="form-group control-medium">
+  <label for="field-level" class="control-label">Access Constraint</label>
+  <div class="controls">
+    <select id="field-level" name="level" data-module="autocomplete">
+      <option value="public" {{ "selected " if "public" == data['level'] }} {{ "selected " if 'only_allowed_users' in data['restricted'] }} >Public</option>
+      <option value="registered" {{ "selected " if "registered" == data['level'] }} {{ "selected " if 'registered' in data['restricted'] }} >Registered Users</option>
+      <option value="any_organization" {{ "selected " if "any_organization" == data['level'] }} {{ "selected " if 'any_organization' in data['restricted'] }} >Any Organization Members (Trusted Users)</option>
+      <option value="same_organization" {{ "selected " if "same_organization" == data['level'] }} {{ "selected " if 'same_organization' in data['restricted'] }} >Same Organization Members</option>
+      <option value="only_allowed_users" {{ "selected " if "only_allowed_users" == data['level'] }} {{ "selected " if 'only_allowed_users' in data['restricted'] }} >Allowed Users Only</option>
+    </select>
+  </div>
+</div>
 
 {# This should only allow valid usernames to be entered and should auto-complete #}
-{{ form.input('allowed_users', id='field-allowed-users', label=_('Allowed Usernames'), value=data['allowed_users']) }}
+{{ form.input('allowed_users', id='field-allowed-users', label=_('Allowed Usernames'), value=data.allowed_users ) }}
 {# SAERISCHEMA_RESFORM_END #}
 
 {% endblock %}
