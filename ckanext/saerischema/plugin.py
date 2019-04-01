@@ -1,3 +1,5 @@
+# 1.12 arb Mon  1 Apr 14:39:53 BST 2019 - implement SaerischemaPlugin_validator_convert_level_from_restricted
+#      fix bug, was always using resource number 0, should be read from key.
 # 1.11 arb Sun 24 Mar 01:51:44 GMT 2019 - inherit package create/update to force dataset into group
 # 1.10 arb Fri 22 Mar 19:16:38 GMT 2019 - convert topic_category into group
 # 1.09 arb Fri 22 Mar 01:05:24 GMT 2019 - fix json quoting when converting level to restricted
@@ -41,6 +43,7 @@ import ckan.logic
 from ckan.logic.action.create import package_create
 from ckan.logic.action.update import package_update
 # general
+import json
 import logging
 import mimetypes
 import saerickan
@@ -109,24 +112,47 @@ def SaerischemaPlugin_validator_convert_bbox_to_spatial(key, flattened_data, err
 
 def SaerischemaPlugin_validator_convert_level_to_restricted(key, flattened_data, errors, context):
     log.debug("SaerischemaPlugin_validator_convert_level_to_restricted flattened_data is %s" % (str(flattened_data)))
-    lv = flattened_data[('resources', 0, 'level')]
-    au = flattened_data[('resources', 0, 'allowed_users')]
+    log.debug("SaerischemaPlugin_validator_convert_level_to_restricted key is %s" % (str(key)))
+    log.debug("SaerischemaPlugin_validator_convert_level_to_restricted key resource num is %s" % key[1])
+    log.debug("SaerischemaPlugin_validator_convert_level_to_restricted key value is %s" % flattened_data[key])
+    log.debug("SaerischemaPlugin_validator_convert_level_to_restricted context is %s" % (str(context)))
+
+    # called with a key like ('resource', N, 'level') we need the value of N to determine which resource to update
+    resource_num = key[1]
+
+    if not ('resources', resource_num, 'level') in flattened_data or not ('resources', resource_num, 'allowed_users') in flattened_data:
+        return
+    lv = flattened_data[('resources', resource_num, 'level')]
+    au = flattened_data[('resources', resource_num, 'allowed_users')]
     #rr = flattened_data[('restricted',)]
     #log.debug("XXX level is %s" % lv)
     #log.debug("XXX restricted is %s" % rr)
     #log.debug("XXX level is %s" % lv)
     #log.debug("XXX users is %s" % au)
     # WRONG json = '{\"allowed_users\": \"%s\", \"level\": \"%s\"}' % (au, lv)
-    json = '{"allowed_users": "%s", "level": "%s"}' % (au, lv)
-    log.debug("SaerischemaPlugin_validator_convert_level_to_restricted setting restricted to %s" % json)
-    flattened_data[('resources', 0, 'restricted')] = json
+    restricted_json = '{"allowed_users": "%s", "level": "%s"}' % (au, lv)
+    log.debug("SaerischemaPlugin_validator_convert_level_to_restricted setting ('resources',%d,'restricted') to %s" % (resource_num, restricted_json))
+    flattened_data[('resources', resource_num, 'restricted')] = restricted_json
 
 
 def SaerischemaPlugin_validator_convert_level_from_restricted(key, flattened_data, errors, context):
-    log.debug("SaerischemaPlugin_validator_convert_level_from_restricted NotYetImplemented flattened_data is %s" % (str(flattened_data)))
-    # Not yet implemented.
+    log.debug("SaerischemaPlugin_validator_convert_level_from_restricted flattened_data is %s" % (str(flattened_data)))
+    log.debug("SaerischemaPlugin_validator_convert_level_from_restricted key is %s" % (str(key)))
+    log.debug("SaerischemaPlugin_validator_convert_level_from_restricted key resource num is %s" % key[1])
+    log.debug("SaerischemaPlugin_validator_convert_level_from_restricted key value is %s" % flattened_data[key])
+
+    # called with a key like ('resource', N, 'level') we need the value of N to determine which resource to update
+    resource_num = key[1]
+
     # Would we ever want to populate the level fields from the restricted field?
     # The latter is never modified directly. Except when a script does it? XXX
+    if not ('resources', resource_num, 'restricted') in flattened_data:
+        return
+    restricted_json = flattened_data[('resources', resource_num, 'restricted')]
+    restricted_dict = json.loads(restricted_json)
+    flattened_data[('resources', resource_num, 'level')] = restricted_dict['level']
+    flattened_data[('resources', resource_num, 'allowed_users')] = restricted_dict['allowed_users']
+    log.debug("SaerischemaPlugin_validator_convert_level_from_restricted setting level %s allowed_users %s" % (flattened_data[('resources', resource_num, 'level')], flattened_data[('resources', resource_num, 'allowed_users')]))
 
 
 def SaerischemaPlugin_validator_convert_topic_category_to_group(key, flattened_data, errors, context):
@@ -412,7 +438,7 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         schema['resources'].update({
             'level': [ toolkit.get_validator('ignore_missing') ]
             ,'allowed_users': [ toolkit.get_validator('ignore_missing') ]
-            ,'restricted': [ toolkit.get_validator('ignore_missing') ]
+            ,'restricted': [ toolkit.get_validator('convert_level_from_restricted'), toolkit.get_validator('ignore_missing') ]
         })
         # If the schema doesn't already have a 'spatial' extra then add it now
         if not 'spatial' in schema:
