@@ -1,4 +1,5 @@
 #!/bin/bash
+# 1.07 arb Wed  3 Apr 12:02:21 BST 2019 - need quotes around 1 in consent test.
 # 1.06 arb Wed 20 Mar 22:45:35 GMT 2019 - additional_info now displays the description instead of the label
 # 1.05 arb Wed 20 Mar 17:21:13 GMT 2019 - topic category added back in
 # 1,04 arb Tue 29 Jan 11:44:09 GMT 2019 - change Hidden logic so sysadmin always allowed even if consent field absent
@@ -125,7 +126,7 @@ cat $file_input | while IFS="	" read label description; do
 	# If the item is saeri_research_permit_application_id then it is hidden unless sysadmin
 	echo '      <td class="dataset-details">'  >> ${file_addinfo_update}
 	if [ $ident == "saeri_research_permit_application_id" ]; then
-		echo '      {% if c.userobj.sysadmin %}{{ pkg_dict.'${ident}' }}' >> ${file_addinfo_update}
+		echo '      {% if (c.userobj and c.userobj.sysadmin) %}{{ pkg_dict.'${ident}' }}' >> ${file_addinfo_update}
 		echo '      {% else %}<i>Hidden (internal use only)</i>'          >> ${file_addinfo_update}
 		echo '      {% endif %}'                                          >> ${file_addinfo_update}
 	# If the item is contact details then it is hidden without consent
@@ -133,7 +134,7 @@ cat $file_input | while IFS="	" read label description; do
 		-o $ident == "saeri_responsible_organisation_name" \
 		-o $ident == "saeri_contact_mail_address" \
 		-o $ident == "saeri_responsible_party_role" ]; then
-		echo '      {% if c.userobj.sysadmin or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == 1 ) %}{{ pkg_dict.'${ident}' }}'   >> ${file_addinfo_update}
+		echo '      {% if (c.userobj and c.userobj.sysadmin) or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == "1" ) %}{{ pkg_dict.'${ident}' }}'   >> ${file_addinfo_update}
 		echo '      {% else %}<i>Hidden (personal data protection)</i>'   >> ${file_addinfo_update}
 		echo '      {% endif %}</td>'       >> ${file_addinfo_update}
 	# The following all require the value to be translated from the database value to a human-readable value

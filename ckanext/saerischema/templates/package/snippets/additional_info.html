@@ -135,7 +135,7 @@
     <tr>
       <th scope="row" class="dataset-label">{{ _("Responsible Organisation Name") }}</th>
       <td class="dataset-details">
-      {% if c.userobj.sysadmin or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == 1 ) %}{{ pkg_dict.saeri_responsible_organisation_name }}
+      {% if (c.userobj and c.userobj.sysadmin) or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == "1" ) %}{{ pkg_dict.saeri_responsible_organisation_name }}
       {% else %}<i>Hidden (personal data protection)</i>
       {% endif %}</td>
       </td>
@@ -145,7 +145,7 @@
     <tr>
       <th scope="row" class="dataset-label">{{ _("Contact Mail Address") }}</th>
       <td class="dataset-details">
-      {% if c.userobj.sysadmin or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == 1 ) %}{{ pkg_dict.saeri_contact_mail_address }}
+      {% if (c.userobj and c.userobj.sysadmin) or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == "1" ) %}{{ pkg_dict.saeri_contact_mail_address }}
       {% else %}<i>Hidden (personal data protection)</i>
       {% endif %}</td>
       </td>
@@ -155,7 +155,7 @@
     <tr>
       <th scope="row" class="dataset-label">{{ _("Responsible Party Role") }}</th>
       <td class="dataset-details">
-      {% if c.userobj.sysadmin or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == 1 ) %}{{ pkg_dict.saeri_responsible_party_role }}
+      {% if (c.userobj and c.userobj.sysadmin) or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == "1" ) %}{{ pkg_dict.saeri_responsible_party_role }}
       {% else %}<i>Hidden (personal data protection)</i>
       {% endif %}</td>
       </td>
@@ -263,7 +263,7 @@
     <tr>
       <th scope="row" class="dataset-label">{{ _("Metadata Point of Contact") }}</th>
       <td class="dataset-details">
-      {% if c.userobj.sysadmin or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == 1 ) %}{{ pkg_dict.saeri_metadata_point_of_contact }}
+      {% if (c.userobj and c.userobj.sysadmin) or ( pkg_dict.saeri_contact_consent and pkg_dict.saeri_contact_consent == "1" ) %}{{ pkg_dict.saeri_metadata_point_of_contact }}
       {% else %}<i>Hidden (personal data protection)</i>
       {% endif %}</td>
       </td>
@@ -293,7 +293,7 @@
     <tr>
       <th scope="row" class="dataset-label">{{ _("Research Permit Application ID") }}</th>
       <td class="dataset-details">
-      {% if c.userobj.sysadmin %}{{ pkg_dict.saeri_research_permit_application_id }}
+      {% if (c.userobj and c.userobj.sysadmin) %}{{ pkg_dict.saeri_research_permit_application_id }}
       {% else %}<i>Hidden (internal use only)</i>
       {% endif %}
       </td>
