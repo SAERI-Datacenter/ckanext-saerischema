@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# 1.07 arb Wed 23 Oct 08:58:00 BST 2019 - Fixed file format extensions.
 # 1.06 arb Mon  1 Apr 23:10:51 BST 2019 - fix if resource already exists.
 # 1.05 arb Mon  1 Apr 22:42:10 BST 2019 - pass id to resource_update not name.
 # 1.04 arb Mon  1 Apr 22:21:57 BST 2019 - can override SRS in all shapefiles
@@ -61,8 +62,9 @@ shp_simplify_factor = 0.01    # you can change this
 # Decide how you want to handle adding a resource which already exists:
 resource_already_exists_action = 'update'  # ignore, update or error
 # Define the file extensions which can be converted to a preview
+# Must have the dot before the suffix
 raster_file_extensions = [ '.tiff', '.tif', '.img' ]
-vector_file_extensions = [ '.gpkg', 'pgeo', 'cad', 'dwg', 'dxf' ]
+vector_file_extensions = [ '.gpkg', '.pgeo', '.cad', '.dwg', '.dxf' ]
 # The default value for all resources is public
 restricted_to = 'public'
 restricted_to_allowable_values = ('public', 'registered', 'any_organization', 'same_organization', 'only_allowed_users')
