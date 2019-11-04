@@ -15,6 +15,7 @@ Contact Mail Address	Mail address
 Responsible Party Role	Select from list in documentation
 Access Limitations	Select from list in documentation
 Use Constraints	eg. No conditions apply; Not for navigation; Research purposes only
+Resource Reference	How to cite this resource
 Data Format	eg. shape, tiff, jpeg, csv, ascii
 Update Frequency	How often the data resource is updated: continual, weekly, fortnightly, monthly, quarterly, annually, biannually, as needed, irregular, one-off, not planned, unknown
 Accuracy	Accuracy of measurements, eg. 1 metre
