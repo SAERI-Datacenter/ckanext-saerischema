@@ -1,4 +1,5 @@
 #!/bin/bash
+# 1.08 arb Mon  4 Nov 09:00:00 GMT 2019 - hide original_title unless sysadmin.
 # 1.07 arb Wed  3 Apr 12:02:21 BST 2019 - need quotes around 1 in consent test.
 # 1.06 arb Wed 20 Mar 22:45:35 GMT 2019 - additional_info now displays the description instead of the label
 # 1.05 arb Wed 20 Mar 17:21:13 GMT 2019 - topic category added back in
@@ -145,6 +146,11 @@ cat $file_input | while IFS="	" read label description; do
 	#	read_options_file_for_additional_info "metadata_form_options_resp_party_role.txt" "${file_addinfo_update}"
 	elif [ "$label" == "Access Limitations" ]; then
 		read_options_file_for_additional_info "metadata_form_options_access_limitations.txt" "${file_addinfo_update}" "$ident"
+	# Original title is hidden unless sysadmin
+	elif [ "$ident" == "saeri_original_title" ]; then
+		echo '      {% if (c.userobj and c.userobj.sysadmin) %}{{ pkg_dict.'${ident}' }}' >> ${file_addinfo_update}
+		echo '      {% else %}<i>Hidden (internal use only)</i>'          >> ${file_addinfo_update}
+		echo '      {% endif %}'                                          >> ${file_addinfo_update}
 	# Status is no longer included because we don't import Incomplete records
 	#elif [ "$label" == "Status" ]; then
 	#	read_options_file_for_additional_info "metadata_form_options_status.txt" "${file_addinfo_update}"
