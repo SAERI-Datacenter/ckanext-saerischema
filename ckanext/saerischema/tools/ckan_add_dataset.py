@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 # Create a dataset from a CSV file
+# 1.12 arb Mon  4 Nov 13:00:00 GMT 2019 - support resource_reference column in CSV
 # 1.11 arb Mon 25 Mar 18:31:53 GMT 2019 - fix access limitations mapping
 # 1.10 arb Tue  5 Feb 12:34:18 GMT 2019 - many improvements and fixes
 # 1.05 arb Wed 30 Jan 10:18:31 GMT 2019 - remove apostrophes from keywords
@@ -71,6 +72,7 @@ map_CSV_to_CKAN = {
 	'responsible_party_role': 'saeri_responsible_party_role',
 	'limitations_access':  'saeri_access_limitations',
 	'use_constraints':     'saeri_use_constraints',
+	'resource_reference':  'saeri_resource_reference',
 	'data_format':      'saeri_data_format',
 	'frequency_update': 'saeri_update_frequency',
 	'accuracy':         'saeri_accuracy',
