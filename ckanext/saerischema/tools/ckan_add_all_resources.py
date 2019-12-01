@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# 1.01 arb Sun  1 Dec 21:17:37 GMT 2019 - the CSV filename column
+#      can contain multiple filenames separated by ^
 # 1.00 arb Sun 24 Mar 22:02:15 GMT 2019
 
 # Read a CSV file of metadata, look in the column 'original_title _dataportal'
@@ -54,35 +56,10 @@ usage = '-c metadata.csv -r repo_dir [-s srs]\n' \
 	'-s is the SRS if the shapefile has none, eg. epsg:2004\n'
 options = 'c:r:s:'
 
-try:
-    opts, args = getopt.getopt(sys.argv[1:], options)
-except getopt.GetoptError:
-    print("usage: %s %s" % (sys.argv[0], usage))
-    sys.exit(1)
-for opt,arg in opts:
-	if opt == '-c':
-		csv_filename = arg
-	if opt == '-r':
-		repo_dir = arg
-	if opt == 's':
-		file_srs = arg
 
-# Read in the CSV file
-fp = open(csv_filename)
-reader = csv.DictReader(fp)
-
-# Process each row
-for row in reader:
-	if not row[column_name_containing_resource_path]:
-		continue
-	print("\n\nUPLOAD to %s", row['title'])
-
-	# Determine the file(s) to be uploaded
+# ---------------------------------------------------------------------
+def process_filename(path_in_csv):
 	# NOTE: file_name is full path, file_basename is full path without ext, file_ext has dot removed
-	# However path in csv might be absolute so remove the first / if so.
-	path_in_csv = row[column_name_containing_resource_path]
-	if path_in_csv[0] == '/':
-		path_in_csv = path_in_csv[1:]
 	file_name = os.path.join(repo_dir, path_in_csv)
 	(file_basename, file_ext) = os.path.splitext(file_name)
 	file_ext = file_ext.replace('.', '') # remove the dot
@@ -100,7 +77,7 @@ for row in reader:
 		if not os.path.isfile(file_name):
 			# not even found in current directory
 			print("File not found %s - for dataset %s" % (file_name, row['title']))
-			continue
+			return
 
 	# See if Shapefiles need to be zipped
 	zip_file_name = ''
@@ -153,6 +130,45 @@ for row in reader:
 	if zip_file_name:
 		#print("remove zip %s" % zip_file_name)
 		os.unlink(zip_file_name)
+
+# ---------------------------------------------------------------------
+# MAIN program
+
+# Decode arguments
+try:
+	opts, args = getopt.getopt(sys.argv[1:], options)
+except getopt.GetoptError:
+	print("usage: %s %s" % (sys.argv[0], usage))
+	sys.exit(1)
+for opt,arg in opts:
+	if opt == '-c':
+		csv_filename = arg
+	if opt == '-r':
+		repo_dir = arg
+	if opt == 's':
+		file_srs = arg
+
+# Read in the CSV file
+fp = open(csv_filename)
+reader = csv.DictReader(fp)
+
+# Process each row
+for row in reader:
+	if not row[column_name_containing_resource_path]:
+		continue
+	print("\n\nUPLOAD to %s" % row['title'])
+
+	# Determine the file(s) to be uploaded
+	# Path in csv might be absolute so remove the first / if so.
+	# Column may contain multiple filenames separated by the ^ character
+	# eg. file1.csv^file2.zip
+	for path_in_csv in [fn.strip() for fn in row[column_name_containing_resource_path].split('^')]:
+
+		# Remove leading slash /
+		if path_in_csv[0] == '/':
+			path_in_csv = path_in_csv[1:]
+
+		process_filename(path_in_csv)
 
 	# Stop after the first row?
 	if only_add_first_entry:
