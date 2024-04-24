@@ -46,7 +46,7 @@ from ckan.logic.action.update import package_update
 import json
 import logging
 import mimetypes
-import saerickan
+from . import saerickan
 
 # Doesn't work (is ignored): logging.basicConfig(filename="/tmp/ckan_debug.log", level=logging.DEBUG) # XXX arb ???
 log = logging.getLogger(__name__)
@@ -409,6 +409,8 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             ,'saeri_access_limitations': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
             ,'saeri_use_constraints': [toolkit.get_converter('convert_from_extras'),
+                            toolkit.get_validator('ignore_missing')]
+            ,'saeri_resource_reference': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
             ,'saeri_data_format': [toolkit.get_converter('convert_from_extras'),
                             toolkit.get_validator('ignore_missing')]
