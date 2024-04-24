@@ -4,7 +4,7 @@
 # 1.02 arb Thu 17 Jan 09:27:57 GMT 2019 - added logging
 # 1.01 arb Fri 21 Dec 11:08:41 GMT 2018 - handle case when only bottom,left is provided
 # 1.00 arb Thu 20 Dec 13:46:04 GMT 2018
-
+from ckan.logic import NotFound
 # Functions for SAERI's CKAN installation
 # Requires pip install pyproj
 
@@ -15,11 +15,11 @@
 # Note that the first and last are the same point.
 
 from pyproj import Proj
-import csv       # for csv.DictReader
-import re        # for re.sub
-import sys,os
+import csv  # for csv.DictReader
+import re  # for re.sub
+import sys, os
 import logging
-import ckan.plugins.toolkit as toolkit # for get_action
+import ckan.plugins.toolkit as toolkit  # for get_action
 
 # Configuration:
 # Define the location of the CSV file which maps topic_category to group name and description
@@ -193,12 +193,16 @@ def saerickan_map_topic_category_to_group(context, topic_category):
     #return ckan.logic.converters.convert_group_name_or_id_to_id(group_name)
  
     # Convert group name to group object by looking it up in ckan database
-    #log.error("XXX topic_category = %s" % topic_category)
-    #log.error("XXX group_name = %s" % group_name)
-    group = toolkit.get_action("group_show")(context, {'id':group_name})
-    #log.error("XXX group id = %s" % group['id'])
-    #log.error("XXX group = %s" % str(group))
-    return(group)
+    # log.error("XXX topic_category = %s" % topic_category)
+    # log.error("XXX group_name = %s" % group_name)
+    group = None
+    try:
+        group = toolkit.get_action("group_show")(context, {'id': group_name})
+    except NotFound:
+        log.error(f'Group {group_name} not found, continuing without group')
+    # log.error("XXX group id = %s" % group['id'])
+    # log.error("XXX group = %s" % str(group))
+    return group
 
 
 # -----------------------------------------------------------------------
