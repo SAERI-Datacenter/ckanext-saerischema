@@ -119,6 +119,7 @@
     </select>
   </div>
 </div>
+  {{ form.input('saeri_resource_reference', label=_('Resource Reference'), id='field-saeri_resource_reference', placeholder=_('How to cite this resource'), value=data.saeri_resource_reference, error=errors.saeri_resource_reference, classes=['control-medium']) }}
   {{ form.input('saeri_data_format', label=_('Data Format'), id='field-saeri_data_format', placeholder=_('eg. shape, tiff, jpeg, csv, ascii'), value=data.saeri_data_format, error=errors.saeri_data_format, classes=['control-medium']) }}
   {{ form.input('saeri_update_frequency', label=_('Update Frequency'), id='field-saeri_update_frequency', placeholder=_('How often the data resource is updated: continual, weekly, fortnightly, monthly, quarterly, annually, biannually, as needed, irregular, one-off, not planned, unknown'), value=data.saeri_update_frequency, error=errors.saeri_update_frequency, classes=['control-medium']) }}
   {{ form.input('saeri_accuracy', label=_('Accuracy'), id='field-saeri_accuracy', placeholder=_('Accuracy of measurements, eg. 1 metre'), value=data.saeri_accuracy, error=errors.saeri_accuracy, classes=['control-medium']) }}

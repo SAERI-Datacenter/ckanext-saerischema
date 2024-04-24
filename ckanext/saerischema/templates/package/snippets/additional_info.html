@@ -211,6 +211,14 @@
       </td>
     </tr>
   {% endif %}
+  {% if pkg_dict.saeri_resource_reference %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Resource Reference") }}</th>
+      <td class="dataset-details">
+        {{ pkg_dict.saeri_resource_reference }}
+      </td>
+    </tr>
+  {% endif %}
   {% if pkg_dict.saeri_data_format %}
     <tr>
       <th scope="row" class="dataset-label">{{ _("Data Format") }}</th>
@@ -247,7 +255,9 @@
     <tr>
       <th scope="row" class="dataset-label">{{ _("Original Title") }}</th>
       <td class="dataset-details">
-        {{ pkg_dict.saeri_original_title }}
+      {% if (c.userobj and c.userobj.sysadmin) %}{{ pkg_dict.saeri_original_title }}
+      {% else %}<i>Hidden (internal use only)</i>
+      {% endif %}
       </td>
     </tr>
   {% endif %}
