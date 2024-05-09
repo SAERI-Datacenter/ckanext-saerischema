@@ -23,17 +23,14 @@
 # 7. Call package_create
 
 from __future__ import print_function
-import urllib2
-import urllib
-import json
-import pprint    # for pprint.pprint
+
 import csv       # for csv.DictReader
 import re        # for re.sub()
 from ckanapi import RemoteCKAN
 # import our tools from the parent directory
 import sys,os
 sys.path.insert(1, os.path.realpath(os.path.pardir))
-import saerickan
+from .. import saerickan
 
 # Configuration
 # ckan_ip.txt = "172.16.92.142" # eg. 172.16.92.142:5000 if using paster serve $ini
