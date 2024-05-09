@@ -96,20 +96,21 @@ def SaerischemaPlugin_validator_convert_bbox_to_spatial(key, flattened_data, err
     # eg. '{ "type": "Polygon", "coordinates": [[ [ -59.26,-51.94 ], [ -57.62,-51.94 ], [ -57.62,-51.16 ], [ -59.26,-51.16 ], [ -59.26,-51.94 ] ]] }'
     geojson = saerickan.saerickan_convert_bbox_to_geojson(srs, n, s, w, e)
 
-    log.debug("SaerischemaPlugin SRS %s" % (srs))
-    log.debug("SaerischemaPlugin N %s" % (n))
-    log.debug("SaerischemaPlugin S %s" % (s))
-    log.debug("SaerischemaPlugin W %s" % (w))
-    log.debug("SaerischemaPlugin E %s" % (e))
-    log.debug("SaerischemaPlugin GeoJSON %s" % (geojson))
+    if geojson != '':
+        log.debug("SaerischemaPlugin SRS %s" % (srs))
+        log.debug("SaerischemaPlugin N %s" % (n))
+        log.debug("SaerischemaPlugin S %s" % (s))
+        log.debug("SaerischemaPlugin W %s" % (w))
+        log.debug("SaerischemaPlugin E %s" % (e))
+        log.debug("SaerischemaPlugin GeoJSON %s" % (geojson))
 
-    # check if spatial exists first
-    # what to do if it does?
-    if ('spatial',) in flattened_data:
-        log.debug("SaerischemaPlugin existing spatial (will be overwritten) was %s" % (flattened_data[('spatial',)]))
+        # check if spatial exists first
+        # what to do if it does?
+        if ('spatial',) in flattened_data:
+            log.debug("SaerischemaPlugin existing spatial (will be overwritten) was %s" % (flattened_data[('spatial',)]))
 
-    # Give the spatial extra the new GeoJSON value.
-    flattened_data[('spatial',)] = geojson
+        # Give the spatial extra the new GeoJSON value.
+        flattened_data[('spatial',)] = geojson
 
 
 def SaerischemaPlugin_validator_convert_level_to_restricted(key, flattened_data, errors, context):
@@ -241,7 +242,7 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IActions)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IValidators) # for get_validators function
-    #plugins.implements(plugins.ITemplateHelpers) # for get_helpers function
+    plugins.implements(plugins.ITemplateHelpers)
 
     log.debug("SaerischemaPlugin created")
 
