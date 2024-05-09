@@ -46,6 +46,8 @@ from ckan.logic.action.update import package_update
 import json
 import logging
 import mimetypes
+
+from ckanext.saerischema.helpers import all_helpers
 from . import saerickan
 
 # Doesn't work (is ignored): logging.basicConfig(filename="/tmp/ckan_debug.log", level=logging.DEBUG) # XXX arb ???
@@ -249,6 +251,13 @@ class SaerischemaPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         return {'package_create': SaerischemaPlugin_package_create,
             'package_update': SaerischemaPlugin_package_update }
 
+    def get_helpers(self):
+        '''Register the most_popular_groups() function above as a template
+        helper function.
+
+        '''
+
+        return all_helpers
     # Return the list of validators which we supply (functions must be global)
     def get_validators(self):
         log.debug("SaerischemaPlugin get_validators returning 3 incl bbox and level")
