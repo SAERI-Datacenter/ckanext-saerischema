@@ -1,17 +1,53 @@
 # Modifying the schema
 
-Run `./metadata_form_to_ckan.sh` to update the schema.
-It can be run more than once safely.
+The dataset schema is managed using the [scheming](https://github.com/ckan/ckanext-scheming) plugin. to enable this schema
+the plugin `scheming_datasets` must be installed and added to `ckan.plugins`. `scheming.dataset_schemas` must also be set to the 
+location of the saerischema.yml file e.g.
+```scheming.dataset_schemas = ckanext.saerischema:/usr/lib/ckan/default/src/ckanext-saeritheme/ckanext/saerischema/saerischema.yml```
 
-It reads the input file `metadata_form_fields.txt` which describes the additional fields in the schema (see below for file format).
+The SAERI schema uses custom presets for some field types. For these fields to work, the custom presets must be added to the 
+ckan configuration 
 
-It updates the content inside `plugin.py` (adding code to create the schema fields),
-`templates/package/snippets/additional_info.html` (displaying the fields on the dataset page), and
-`templates/package/snippets/package_basic_fields.html` (editing fields on the dataset create/update page).
+`scheming.presets = ckanext.scheming:presets.json ckanext.saerischema:/usr/lib/ckan/default/src/ckanext-saerischema/ckanext/saerischema/presets.json`
 
-It handles these schema fields as special cases: `Region`, `Responsible Party Role`, `Access Limitations`, `Status`, `Topic Category`, `Use Constraints`, `Contact Consent`. They all require a drop-down menu, so the list of options to put in each menu has to be defined somewhere. The respective files are metadata_form_options...txt (eg. `metadata_form_options_region.txt`).
 
-To add additional Spatial Reference Systems please edit `saerickan.oy`
+## Option Fields
+All option fields are controlled using csv files to simplify the customization of the options in different environments. to add a new option field
+1. create a new csv file in the directory `ckanext/saerischema`
+2. register the file in `field_file_map` in helpers.py where the key is the field name
+3. add the field to `saerischema.yml` using the same field name and enabling the saerischema_csv_choices helper.
+```yaml
+  field_name: saeri_responsible_party_role
+  label: Responsible Party Role
+  display_snippet: display_redacted.html
+  preset: select
+  choices_helper: saerischema_csv_choices
+  ```
+
+### Adding internal fields
+An internal field is a dataset field which can only be viewed by logged-in users. Any field can be marked as internal by
+setting the display_snippet of that field to `display_internal.html` e.g. 
+```yaml
+  field_name: saeri_contact_consent
+  label: Contact Consent
+  display_snippet: display_internal.html
+  help_text: "Whether contact details may be published"
+  preset: select
+  choices_helper: saerischema_csv_choices
+```
+
+### Adding restricted fields
+A restricted field is a dataset field which can only be viewed by logged-in users or if the contact as allowed consent. 
+Any field can be marked as internal by setting the display_snippet of that field to `display_redacted.html` e.g. 
+```yaml
+  field_name: saeri_responsible_party_role
+  label: Responsible Party Role
+  display_snippet: display_redacted.html
+  preset: select
+  choices_helper: saerischema_csv_choices
+```
+
+To add additional Spatial Reference Systems please edit `saerickan.py`
 
 The plugin MUST have access to the list of topic categories so that it can map to CKAN groups.
 The `saerickan.py` script is hard-coded to use `/usr/lib/ckan/default/src/ckanext-saeritheme/ckanext/saeritheme/tools/topic_categories.csv`
@@ -21,34 +57,15 @@ This is the default location as used in the theme plugin but the administrator m
 
 The definition of the metadata fields. This was used to create metadata_form_fields.txt and the metadata_form_options files. If you change this spreadsheet you should also change those files.
 
-## metadata_form_to_ckan.sh
-
-Script to read metadata_form_fields.txt and metadata_form_options files and update the CKAN extension files (plugin.py etc) to display and store the metadata fields when a dataset is created/updated/displayed. The updated files are plugin.py, templates/package/snippets/additional_info.html, templates/package/snippets/package_basic_fields.html, templates/package/snippets/package_metadata_fields.html. The original files are in /usr/lib/ckan/default/src/ckan/ckan/templates/package/snippets.
-
-## metadata_form_fields.txt
-
-The metadata field names, one per line, tab separated label and description.
-Do not change these once you've started populating CKAN otherwise the content of the database will be inconsistent.
-Note that Title, Keyword and Abstract have been removed because CKAN already has these built in.
-
 ## metadata_form_options_*.txt
 
 These files are used to create the drop-down menus when a new dataset is created. They are one option per line, tab separated id and label.
-
-# Note
-
-There are two fields which re-use the built-in defaults (Description and Tags) but with different names (Abstract and Keywords respectively).
-They are "commented out" in package_basic_fields.html and then the code is copied from the original and reimplemented (with the new label) inside the package_basic_fields_custom block but at the top instead of at the bottom.
 
 # Technical details
 
 `package_basic_fields.html` is hiding the blocks `package_basic_fields_description` and `package_basic_fields_tags` then adding what would have been their contents in a different place on the page.
 
 It uses macros which are defined in `/usr/lib/ckan/default/src/ckan/ckan/templates-bs2/macros/form.html` to create the input elements. It does not (yet) use `form.select` for the drop-down menus, instead it builds them itself. It checks the `data` variable to see which option needs to be selected based on the current value of the field from the dataset, eg. `data['saeri_region'] == "FK"`. Other variables it could use are `pkg` or `c.user` or `c.userobj` or `app_globals`, eg. `app_globals.site_url`. 
-
-The `metadata_form_to_ckan.sh` script creates the `additional_info.html` file which is used to display the dataset contents.
-It handles two fields slightly differently: contact details and research permit application id should be hidden by default.
-Conact details are only visible if consent has been given. In both cases the values will be shown to sysadmin users.
 
 The allowed values for Spatial Reference System (SRS/CRS) are defined in the `saerickan.py` script.
 

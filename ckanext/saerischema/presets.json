@@ -1,0 +1,22 @@
+{
+  "scheming_presets_version": 1,
+  "about": "Additional presets used in the saeri schema",
+  "about_url": "http://github.com/ckan/ckanext-scheming#preset",
+  "presets": [
+    {
+      "preset_name": "user_string_autocomplete",
+      "values": {
+        "validators": "ignore_missing tag_string_convert",
+        "classes": [
+          "control-full"
+        ],
+        "form_attrs": {
+          "data-module": "autocomplete",
+          "data-module-tags": "",
+          "data-module-source": "/api/2/util/user/autocomplete?&q=?",
+          "class": ""
+        }
+      }
+    }
+  ]
+}

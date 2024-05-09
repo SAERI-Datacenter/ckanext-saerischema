@@ -200,7 +200,7 @@ def saerickan_map_topic_category_to_group(context, topic_category):
     topic_category_to_group_dict = saerickan_create_mapping_topic_category_to_group()
 
     # Convert topic_category to group name using CSV info
-    group_name = topic_category_to_group_dict[topic_category]
+    group_name = topic_category_to_group_dict.get(topic_category)
 
     # Convert group name to group id using a validator, doesn't work
     # return ckan.logic.converters.convert_group_name_or_id_to_id(group_name)

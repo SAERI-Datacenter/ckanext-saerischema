@@ -1,0 +1,5 @@
+{% if (c.userobj and c.userobj.sysadmin) or ( data.saeri_contact_consent and data.saeri_contact_consent == "1" ) %}
+    {{ data[field.field_name] }}
+{% else %}
+    <i>Hidden (personal data protection)</i>
+{% endif %}

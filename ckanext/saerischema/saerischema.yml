@@ -1,0 +1,278 @@
+scheming_version: 2
+dataset_type: dataset
+about: SAERI Geospatial metadata schema for datasets
+about_url: http://github.com/ckan/ckanext-scheming
+
+
+dataset_fields:
+
+# Basic Info page
+- start_form_page:
+    title: Description
+    description: Required and core dataset fields
+
+  field_name: saeri_region
+  label: Region
+  preset: select
+  choices_helper: saerischema_csv_choices
+  help_text: What region was this dataset collected in
+
+- field_name: owner_org
+  label: Organization
+  preset: dataset_organization
+
+- field_name: title
+  label: Title
+  preset: title
+  form_placeholder: eg. A descriptive title
+
+- field_name: name
+  label: URL
+  preset: dataset_slug
+  form_placeholder: eg. my-dataset
+
+- field_name: saeri_language
+  label: Resource Language
+  help_text: "Language Code: eng, spa, fre, ita, ger"
+  form_placeholder: eg. Language
+
+- field_name: notes
+  label: Abstract
+  form_snippet: markdown.html
+  form_placeholder: eg. Some useful notes about the data
+
+- field_name: saeri_topic_category
+  label: Topic Category
+  form_include_blank_choice: false
+  preset: select
+  choices_helper: saerischema_csv_choices
+  help_text: "The Theme (group) of the dataset"
+
+- field_name: tag_string
+  label: Keywords
+  preset: tag_string_autocomplete
+  form_placeholder: eg. economy, mental health, government
+
+- field_name: saeri_lineage
+  label: Lineage
+  form_snippet: markdown.html
+  help_text: "How the data was created, source, process, method updating, quality control"
+
+- field_name: saeri_dataset_reference_date
+  label: Dataset Reference Date
+  form_place_holder: YYYY-MM-DD or YYYY
+  help_text: "Date that identifies the currency of the publication data"
+
+- field_name: saeri_unique_resource_id
+  label: "Unique Resource ID"
+  form_placeholder: "eg. FK-XXX-1"
+
+- field_name: saeri_research_permit_application_id
+  label: "Research Permit Application ID"
+  form_placeholder: "Research Permit application number"
+  display_snippet: display_internal.html
+
+- field_name: saeri_metadata_date
+  label: Metadata Date
+  help_text: "Date of original metadata in the form YYYY-MM-DD"
+
+
+- start_form_page:
+    title: Extent
+    description:
+      Temporal and Spatial Extent of this dataset
+
+  field_name: saeri_temporal_extent_start
+  label: Start date
+  help_text: Start date for this dataset
+  form_placeholder: Start date in the form YYYY-MM-DD or YYYY
+
+- field_name: saeri_temporal_extent_end
+  label: End date
+  help_text: End date for this dataset
+  form_placeholder: End date in the form YYYY-MM-DD or YYYY
+
+- field_name: spatial
+  label: spatial
+  required: false
+  display_snippet: null
+  validators: convert_bbox_to_spatial ignore_missing
+
+- field_name: saeri_west_longitude
+  label: West Longitude
+  help_text: West Longitude in Decimal degrees (dd.ddd) with plus or minus as necessary
+  form_placeholder: format 00.000
+
+- field_name: saeri_south_latitude
+  label: South Latitude
+  help_text: South Latitude in Decimal degrees (dd.ddd) with plus or minus as necessary
+  form_placeholder: format 00.000
+
+- field_name: saeri_east_longitude
+  label: East Longitude
+  help_text: East Longitude in Decimal degrees (dd.ddd) with plus or minus as necessary
+  form_placeholder: format 00.000
+
+- field_name: saeri_north_latitude
+  label: North Latitude
+  help_text: North Latitude in Decimal degrees (dd.ddd) with plus or minus as necessary
+  form_placeholder: format 00.000
+
+- field_name: saeri_spatial_reference_system
+  label: "Spatial Reference System"
+  form_placeholder: EPSG:nnnn, or WGS84, UTM30S, etc
+  help_text: Spatial Reference System
+
+- start_from_page:
+    title: Data Information
+    description: information about the data package
+
+  field_name: saeri_data_format
+  label: Data Format
+  form_placeholder: "e.g. shape, tiff, jpeg, csv, ascii"
+
+- field_name: saeri_update_frequency
+  label: Update Frequency
+  help_text: "How often the data resource is updated: continual, weekly, fortnightly, monthly, quarterly, annually, biannually, as needed, irregular, one-off, not planned, unknown"
+
+- field_name: saeri_accuracy
+  label: Accuracy
+  form_placeholder: "Accuracy of measurements, eg. 1 metre"
+
+- field_name: saeri_resource_type
+  label: Resource Type
+  form_placeholder: "Dataset; Data series; Database; nonGeographicalDataset; report"
+
+- field_name: saeri_original_title
+  label: "Original Title"
+  display_snippet: display_internal.html
+  help_text: "The original title of the file"
+
+- start_form_page:
+    title: Responsibilities
+    description: Responsible party for this this dataset
+
+  field_name: saeri_responsible_organisation_name
+  label: Responsible Organisation Name
+  form_placeholder: Multiple organisations may be provided
+  help_text: "Indicates the organisation responsible for the creation and the maintenance of this metadata entry"
+  display_property: dc:creator
+  display_snippet: display_redacted.html
+
+- field_name: saeri_metadata_point_of_contact
+  label: Metadata Point of Contact
+  display_snippet: display_redacted.html
+  form_placeholder: Organisation Responsible
+
+- field_name: saeri_contact_email_address
+  label: Contact Email Address
+  form_placeholder: joe@example.com
+  display_property: dc:creator
+  display_snippet: display_redacted.html
+  validators: ignore_missing unicode_safe strip_value email_validator
+
+- field_name: saeri_responsible_party_role
+  label: Responsible Party Role
+  display_snippet: display_redacted.html
+  preset: select
+  choices_helper: saerischema_csv_choices
+
+- field_name: saeri_contact_consent
+  label: Contact Consent
+  display_snippet: display_internal.html
+  help_text: "Whether contact details may be published"
+  preset: select
+  choices_helper: saerischema_csv_choices
+
+- field_name: saeri_access_limitations
+  label: Access Limitations
+  form_include_blank_choice: false
+  preset: select
+  choices_helper: saerischema_csv_choices
+  help_text: "What access limitations apply to this dataset"
+
+- field_name: saeri_use_constraints
+  label: Use Constraints
+  preset: select
+  choices_helper: saerischema_csv_choices
+  help_text: "eg. No conditions apply; Not for navigation; Research purposes only"
+
+- start_form_page:
+    title: Data Info
+    description:
+      Information about the data package
+
+  field_name: saeri_resource_reference
+  label: Resource Reference
+  help_text: "How to cite this resource"
+
+- field_name: license_id
+  label: License
+  form_snippet: license.html
+  help_text: License definitions and additional information can be found at http://opendefinition.org/
+
+- field_name: url
+  label: Source
+  form_placeholder: http://example.com/dataset.json
+  display_property: foaf:homepage
+  display_snippet: link.html
+
+- field_name: version
+  label: Version
+  validators: ignore_missing unicode_safe package_version_validator
+  form_placeholder: '1.0'
+
+resource_fields:
+
+- field_name: url
+  label: URL
+  preset: resource_url_upload
+
+- field_name: name
+  label: Name
+  form_placeholder: eg. January 2011 Gold Prices
+
+- field_name: restricted
+  form_snipped: null
+
+- field_name: level
+  validators: ignore_missing convert_level_to_restricted
+  label: Access Constraint
+  preset: select
+  choices:
+  - value: public
+    label: Public
+  - value: registered
+    label: Registered Users
+  - value: any_organization
+    label: Any Organization Members (Trusted Users)
+  - value: same_organization
+    label: Same Organization Members
+  - value: only_allowed_users
+    label: Allowed Users Only
+
+- field_name: allowed_users
+  label: Allowed Usernames
+  preset: user_string_autocomplete
+
+- field_name: description
+  label: Description
+  form_snippet: markdown.html
+  form_placeholder: Some useful notes about the data
+
+- field_name: saeri_scan_spatial
+  label: Process spatial file
+  preset: multiple_checkbox
+  help_text: "Shape files can be scanned to extract useful spatial information"
+  display_snippet: null
+  choices:
+  - value: extent
+    label: "Calculate Extent"
+  - value: geoJson
+    label: "Generate GeoJson"
+
+  form_placeholder: Some useful notes about the data
+
+- field_name: format
+  label: Format
+  preset: resource_format_autocomplete
