@@ -1,0 +1,13 @@
+{% ckan_extends %}
+
+{% block secondary_content %}
+  <div class="filters">
+    <div>
+      {% for facet in facet_titles %}
+          {% set labeller= h.saerischema_get_labeler_for_facet(facet) %}
+        {{ h.snippet('snippets/facet_list.html', label_function=labeller, title=facet_titles[facet], name=facet, search_facets=search_facets) }}
+      {% endfor %}
+    </div>
+    <a class="close no-text hide-filters"><i class="fa fa-times-circle"></i><span class="text">close</span></a>
+  </div>
+{% endblock %}

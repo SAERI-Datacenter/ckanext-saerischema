@@ -1,6 +1,7 @@
 import csv
 import logging
 import os
+from ckantoolkit import h
 
 all_helpers = {}
 
@@ -31,6 +32,33 @@ field_file_map = {
 """
 dict containing the map of option fields names to their respective csv files.
 """
+
+
+@helper
+def saerischema_get_labeler_for_facet(facet, schema_type='dataset'):
+    """
+    
+    :param schema_type: type of scheming schema to use, defaults to 'dataset'
+    :param facet: the facet requiring a labeler  
+    :return: a labeler function for scheming files or None if no field was not a scheming field or a choices field
+    """
+    log.info(h.scheming_get_dataset_schema('dataset'))
+    scheming_field = h.scheming_field_by_name(h.scheming_get_dataset_schema(schema_type)['dataset_fields'], facet)
+
+    # Not a scheming field don't create a labeler and use the default
+    if scheming_field is None:
+        return None
+
+    choices = h.scheming_field_choices(scheming_field)
+
+    # Not a choices field, don't create a labeler and use the default
+    if choices is None:
+        return None
+
+    def get_label_for_field(field):
+        return h.scheming_choices_label(choices, field['name'])
+
+    return get_label_for_field
 
 
 @helper
