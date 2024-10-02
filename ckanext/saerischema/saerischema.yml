@@ -233,7 +233,8 @@ resource_fields:
   form_placeholder: eg. January 2011 Gold Prices
 
 - field_name: restricted
-  form_snipped: null
+  form_snippet: null
+  display_snippet: null
 
 - field_name: level
   validators: ignore_missing convert_level_to_restricted
