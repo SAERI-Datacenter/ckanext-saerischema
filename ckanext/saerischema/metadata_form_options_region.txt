@@ -1,7 +1,3 @@
-FK	Falkland Islands
-SH	Saint Helena
-AC	Ascension Island
-TA	Tristan da Cunha
-GS	South Georgia
-MS	Montserrat
-UK	UK
+FK	Within NIMPA
+SH	Within Continental Shelf
+AC	Wider NIMPA Area
